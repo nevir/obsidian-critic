@@ -1,0 +1,26 @@
+{
+  "linter": {
+    "rules": {
+      "suspicious": {
+        // TypeScript rejects duplicate keys in JS/TS; the base override turns
+        // this rule back on for JSON, where TypeScript cannot help.
+        "noDuplicateObjectKeys": "off",
+
+        // Disallow empty sources.
+        // Empty placeholder style or schema files can be valid while scaffolding a
+        // generated plugin.
+        "noEmptySource": "off",
+
+        // Disallows the use of irregular whitespace characters.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noIrregularWhitespace": "error",
+
+        // Disallow unnecessary escapes in string literals.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noUselessEscapeInString": "error"
+      }
+    }
+  }
+}

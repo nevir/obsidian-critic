@@ -1,0 +1,142 @@
+name: Prepare release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: release-main
+  queue: max
+
+jobs:
+  release:
+    name: Apply version and dispatch publication
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Configure the release author
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config commit.gpgsign false
+          git config tag.gpgsign false
+
+      - name: Build the release branch for this merge
+        env:
+          MERGE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          latest_tag="$(git tag --list '[0-9]*.[0-9]*.[0-9]*' \
+            --sort=-version:refname | head -n 1)"
+
+          if [[ -n "$latest_tag" ]]; then
+            git switch --create release-work "$latest_tag"
+            git merge --no-ff --no-edit "$MERGE_SHA"
+          else
+            git switch --create release-work "$MERGE_SHA"
+          fi
+
+      - name: Install the locked toolchain
+        uses: jdx/mise-action@v4
+        with:
+          cache: true
+          install: true
+          version: 2026.6.14
+
+      - name: Locate the Yarn package cache
+        id: yarn-cache
+        run: echo "directory=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Yarn package cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.yarn-cache.outputs.directory }}
+          key: yarn-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('mise.lock', 'yarn.lock') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: mise run install
+
+      - name: Require a release-producing deferred version
+        run: node .toolchain/check-version-plan.mjs
+
+      - name: Read the previous version
+        id: previous-version
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Apply the deferred version
+        run: |
+          yarn version apply --all
+          node .toolchain/sync-version.mjs --write
+
+      - name: Read and verify the version
+        id: version
+        env:
+          PREVIOUS_VERSION: ${{ steps.previous-version.outputs.version }}
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [[ "$version" == "$PREVIOUS_VERSION" ]]; then
+            echo '::error::The deferred record did not request a release.'
+            exit 1
+          fi
+          if git rev-parse --verify --quiet "refs/tags/$version"; then
+            echo "::error::Tag $version already exists."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate the release
+        run: mise run check
+
+      - name: Commit and tag the release
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git add --all -- .yarn/versions package.json manifest.json versions.json yarn.lock
+          git commit -m "Release $VERSION"
+          git tag "$VERSION"
+
+      - name: Integrate newer main commits, revalidate, and push atomically
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5; do
+            echo "Push attempt $attempt of 5."
+            git fetch origin main
+            if ! git merge-base --is-ancestor origin/main HEAD; then
+              git merge --no-ff \
+                -m "Integrate main into release $VERSION" \
+                origin/main
+              mise run check
+              node .toolchain/sync-version.mjs --check
+            fi
+
+            if git push --atomic origin HEAD:main "refs/tags/$VERSION"; then
+              exit 0
+            fi
+          done
+
+          echo '::error::Main kept changing while the release was prepared.'
+          exit 1
+
+      - name: Dispatch publication from the release tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh workflow run publish-release.yml --ref "$VERSION"

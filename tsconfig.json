@@ -1,0 +1,3 @@
+{
+  "extends": "./.toolchain/typescript/project.jsonc"
+}

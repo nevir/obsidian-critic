@@ -1,0 +1,12 @@
+{
+  "linter": {
+    "rules": {
+      "complexity": {
+        // Disallow the use of the !important style.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noImportantStyles": "error"
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "linter": {
+    "rules": {
+      "suspicious": {
+        // Prevents the misuse of glob patterns inside the files.includes field.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noBiomeFirstException": "error",
+
+        // Prevent the listing of duplicate dependencies. The rule supports the
+        // following dependency groups: "bundledDependencies", "bundleDependencies",
+        // "dependencies", "devDependencies", "overrides", "optionalDependencies",
+        // and "peerDependencies".
+        // Listing a package in multiple sections creates an ambiguous ownership
+        // and version policy for installs and releases.
+        "noDuplicateDependencies": "error",
+
+        // Disallow quickfix.biome inside editor settings files.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noQuickfixBiome": "error",
+
+        // Promotes the correct usage for ignoring folders in the configuration
+        // file.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useBiomeIgnoreFolder": "error",
+
+        // Enforce the presence of required scripts in package.json.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "useRequiredScripts": "off"
+      }
+    }
+  }
+}

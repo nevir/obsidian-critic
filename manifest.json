@@ -1,0 +1,11 @@
+{
+  "id": "template",
+  "name": "Obsidian Template",
+  "description": "A template for creating Obsidian plugins",
+  "version": "0.1.1",
+  "minAppVersion": "1.12.7",
+  "isDesktopOnly": false,
+  "author": "Ian MacLeod",
+  "authorUrl": "https://github.com/nevir",
+  "fundingUrl": "https://github.com/sponsors/nevir"
+}

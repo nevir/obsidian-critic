@@ -1,0 +1,131 @@
+// Type-check against Obsidian's shared desktop and mobile plugin runtime.
+{
+  // https://www.typescriptlang.org/tsconfig
+  "compilerOptions": {
+    // Language and Environment
+    // ========================
+
+    // Obsidian plugins use browser APIs on both desktop and mobile.
+    "lib": ["DOM", "DOM.Iterable", "ES2021"],
+
+    // Treat every source file as a module, even before it has imports.
+    "moduleDetection": "force",
+
+    // Match the ES2021 baseline in Obsidian's official universal plugin sample.
+    "target": "ES2021",
+
+    // Match native class-field behavior in supported WebViews and Electron.
+    "useDefineForClassFields": true,
+
+    // Modules
+    // =======
+
+    // Preserve imports and exports for Parcel to bundle.
+    "module": "Preserve",
+
+    // Resolve packages the same way as a modern bundler.
+    "moduleResolution": "Bundler",
+
+    // Fail when a side-effect import cannot be resolved.
+    "noUncheckedSideEffectImports": true,
+
+    // Do not expose Node globals that are unavailable on Obsidian mobile.
+    "types": [],
+
+    // Interop Constraints
+    // ===================
+
+    // Parcel transpiles each file independently.
+    "isolatedModules": true,
+
+    // Parcel safely transpiles the parameter properties used by the template.
+    "erasableSyntaxOnly": false,
+
+    // Avoid platform-specific import bugs on case-insensitive filesystems.
+    "forceConsistentCasingInFileNames": true,
+
+    // Preserve import syntax and require type-only imports where needed.
+    "verbatimModuleSyntax": true,
+
+    // Emit
+    // ====
+
+    // Parcel owns output; TypeScript only checks types.
+    "noEmit": true,
+
+    // Type Checking
+    // =============
+    // Every option in TypeScript's Type Checking category is explicit so a
+    // compiler upgrade cannot silently change this policy.
+
+    // Help catch refactoring errors.
+    "allowUnreachableCode": false,
+
+    // Help catch refactoring errors.
+    "allowUnusedLabels": false,
+
+    // Keep parsed script files in strict mode even when they have no imports.
+    "alwaysStrict": true,
+
+    // Would be nice, but in practice it is too strict.
+    "exactOptionalPropertyTypes": false,
+
+    // Covered by Biome as an error.
+    "noFallthroughCasesInSwitch": false,
+
+    // Make sure that we annotate any code TypeScript cannot infer types of.
+    "noImplicitAny": true,
+
+    // Help catch refactoring errors.
+    "noImplicitOverride": true,
+
+    // Usually a programmer error.
+    "noImplicitReturns": true,
+
+    // Make sure that we annotate any code TypeScript cannot infer types of.
+    "noImplicitThis": true,
+
+    // Use different syntax between explicitly defined properties and indexed
+    // values, so it is clear to the reader.
+    "noPropertyAccessFromIndexSignature": true,
+
+    // Rather than assume that indexed values always exist; let's be explicit.
+    "noUncheckedIndexedAccess": true,
+
+    // Help catch refactoring errors.
+    "noUnusedLocals": true,
+
+    // Help catch refactoring errors.
+    "noUnusedParameters": true,
+
+    // Make sure that we opt into future strict mode features.
+    "strict": true,
+
+    // Make sure that call() and apply() are type checked.
+    "strictBindCallApply": true,
+
+    // Do not let iterator return values silently become any.
+    "strictBuiltinIteratorReturn": true,
+
+    // Catch subtle bugs around functions as arguments.
+    "strictFunctionTypes": true,
+
+    // Prevent most null-pointer exceptions.
+    "strictNullChecks": true,
+
+    // Don't assume that properties are always initialized.
+    "strictPropertyInitialization": true,
+
+    // This TS 6-to-7 migration aid can slow checks by up to 25%.
+    "stableTypeOrdering": false,
+
+    // JavaScript allows arbitrary types to be thrown.
+    "useUnknownInCatchVariables": true,
+
+    // Completeness
+    // ============
+
+    // Check dependency declarations against this compiler version too.
+    "skipLibCheck": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "linter": {
+    "rules": {
+      "nursery": {
+        // Disallow empty keys in JSON objects.
+        // Empty metadata keys are almost certainly typos and cannot be addressed
+        // clearly by readers or tooling.
+        "noEmptyObjectKeys": "error",
+
+        // Require the JSON top-level value to be an array or object.
+        // Template JSON files are structured metadata or configuration, so a
+        // scalar root indicates an incomplete or malformed file.
+        "noTopLevelLiterals": "error",
+
+        // Disallow dependencies with untrusted licenses.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "noUntrustedLicenses": "off"
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "linter": {
+    "rules": {
+      "nursery": {
+        // Disallow the use of inline styles.
+        // Obsidian plugins sometimes need runtime styles through DOM APIs; forbid
+        // static CSS mistakes without banning all dynamic styling.
+        "noInlineStyles": "off",
+
+        // Disallow dependencies that are known to have better alternatives.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "noRestrictedDependencies": "off",
+
+        // Reports CSS class names in HTML class attributes that are not defined in
+        // any \<style> block or linked stylesheet available to the file.
+        // Obsidian loads the release `styles.css` separately, so Biome cannot
+        // reliably connect those classes to TypeScript-created DOM.
+        "noUndeclaredClasses": "off",
+
+        // Enforce the 'sandbox' attribute for 'iframe' elements.
+        // Unsandboxed embedded content receives broad capabilities inside the
+        // Obsidian renderer, so every iframe must declare its restrictions.
+        "useIframeSandbox": "error"
+      }
+    }
+  }
+}

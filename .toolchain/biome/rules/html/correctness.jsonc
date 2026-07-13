@@ -1,0 +1,78 @@
+{
+  "linter": {
+    "rules": {
+      "correctness": {
+        // Disallow duplication of attributes.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateAttributes": "error",
+
+        // Disallow using v-if and v-for directives on the same element.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueVIfWithVFor": "off",
+
+        // Enforce valid Vue \<template> root usage.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidTemplateRoot": "off",
+
+        // Forbids v-bind directives with missing values or invalid modifiers.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVBind": "off",
+
+        // Enforce valid v-cloak Vue directives.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVCloak": "off",
+
+        // Enforce valid usage of v-else.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVElse": "off",
+
+        // Enforce valid v-else-if directives.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVElseIf": "off",
+
+        // Enforce valid v-html directives.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVHtml": "off",
+
+        // Enforces valid v-if usage for Vue templates.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVIf": "off",
+
+        // Enforce valid v-on directives with proper arguments, modifiers, and
+        // handlers.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVOn": "off",
+
+        // Enforce valid v-once Vue directives.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVOnce": "off",
+
+        // Enforce valid v-pre Vue directives.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVPre": "off",
+
+        // Enforce valid v-text Vue directives.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVText": "off",
+
+        // Enforce that elements using v-for also specify a unique key.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueVForKey": "off"
+      }
+    }
+  }
+}

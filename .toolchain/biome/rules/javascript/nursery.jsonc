@@ -1,0 +1,351 @@
+{
+  "linter": {
+    "rules": {
+      "nursery": {
+        // Require stringification to avoid values that only use the default object
+        // representation.
+        // Default object stringification produces "[object Object]", which is
+        // never useful in plugin notices, settings text, or diagnostics.
+        "noBaseToString": "error",
+
+        // Disallows defining React components or custom hooks inside other
+        // functions.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noComponentHookFactories": "off",
+
+        // Disallow conditional expect() calls inside tests.
+        // The template does not use the test domain; enable this when that
+        // framework or tool is deliberately added.
+        "noConditionalExpect": "off",
+
+        // Require .where() to be called when using .delete() with Drizzle ORM.
+        // The template does not use the drizzle domain; enable this when that
+        // framework or tool is deliberately added.
+        "noDrizzleDeleteWithoutWhere": "off",
+
+        // Require .where() to be called when using .update() with Drizzle ORM.
+        // The template does not use the drizzle domain; enable this when that
+        // framework or tool is deliberately added.
+        "noDrizzleUpdateWithoutWhere": "off",
+
+        // Enforce a maximum depth that callbacks can be nested.
+        // The threshold is subjective and should follow real plugin size data
+        // rather than constrain a reusable starter.
+        "noExcessiveNestedCallbacks": "off",
+
+        // Require Promise-like statements to be handled appropriately.
+        // Every plugin lifecycle and settings promise must be awaited, returned,
+        // or deliberately handled so rejections cannot disappear.
+        "noFloatingPromises": "error",
+
+        // Disallow identical titles in test suites and test cases.
+        // The template does not use the test domain; enable this when that
+        // framework or tool is deliberately added.
+        "noIdenticalTestTitle": "off",
+
+        // Disallow the use of eval()-like methods.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noImpliedEval": "error",
+
+        // Flags text nodes with a trailing $ before a JSX expression.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noJsxLeakedDollar": "off",
+
+        // Disallow JSX namespace syntax.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noJsxNamespace": "off",
+
+        // Disallow functions declared inside loops that capture unsafe outer
+        // variables.
+        // Deferred callbacks can otherwise observe a later loop value and act on
+        // the wrong Obsidian item or DOM element.
+        "noLoopFunc": "error",
+
+        // Detect return type annotations that are misleadingly wider than what the
+        // implementation actually returns.
+        // An unnecessarily wide annotation advertises impossible outcomes and
+        // weakens useful narrowing for callers.
+        "noMisleadingReturnType": "error",
+
+        // Disallow Promises to be used in places where they are almost certainly a
+        // mistake.
+        // A promise used as a condition is always truthy, while one passed to a
+        // synchronous callback can leave failures unobserved.
+        "noMisusedPromises": "error",
+
+        // Disallow usage of element handles (page.$() and page.$$()).
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightElementHandle": "off",
+
+        // Disallow usage of page.$eval() and page.$$eval().
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightEval": "off",
+
+        // Disallow usage of the { force: true } option.
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightForceOption": "off",
+
+        // Enforce Playwright async APIs to be awaited or returned.
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightMissingAwait": "off",
+
+        // Disallow usage of the networkidle option.
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightNetworkidle": "off",
+
+        // Disallow using page.pause().
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightPagePause": "off",
+
+        // Disallow unnecessary await for Playwright methods that don't return
+        // promises.
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightUselessAwait": "off",
+
+        // Disallow using page.waitForNavigation().
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightWaitForNavigation": "off",
+
+        // Disallow using page.waitForSelector().
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightWaitForSelector": "off",
+
+        // Disallow using page.waitForTimeout().
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "noPlaywrightWaitForTimeout": "off",
+
+        // Disallow deep imports from the react-native package.
+        // The template does not use the reactNative domain; enable this when that
+        // framework or tool is deliberately added.
+        "noReactNativeDeepImports": "off",
+
+        // Disallow color literals in React Native styles.
+        // The template does not use the reactNative domain; enable this when that
+        // framework or tool is deliberately added.
+        "noReactNativeLiteralColors": "off",
+
+        // Disallow raw text outside \<Text> components in React Native.
+        // The template does not use the reactNative domain; enable this when that
+        // framework or tool is deliberately added.
+        "noReactNativeRawText": "off",
+
+        // Disallow string refs in React components.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noReactStringRefs": "off",
+
+        // Disallow unnecessary $state wrapping of reactive classes.
+        // The template does not use the svelte domain; enable this when that
+        // framework or tool is deliberately added.
+        "noSvelteUnnecessaryStateWrap": "off",
+
+        // Disallow unnecessary template expressions.
+        // Redundant interpolation obscures the resulting string and falsely
+        // suggests that a static portion is dynamic.
+        "noUnnecessaryTemplateExpression": "error",
+
+        // Disallow + operations with operands that are known to be unsafe.
+        // Unsafe operands make + switch unexpectedly between arithmetic and
+        // coercive concatenation, which can corrupt displayed or persisted data.
+        "noUnsafePlusOperands": "error",
+
+        // Disallow type conversions that do not change the type of an expression.
+        // A no-op conversion adds false assurance and often signals stale code or
+        // a mistaken understanding of the value's type.
+        "noUselessTypeConversion": "error",
+
+        // Disallow importing Vue compiler macros.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueImportCompilerMacros": "off",
+
+        // Disallow the use of value wrapped by ref()(Composition API) as operand.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueRefAsOperand": "off",
+
+        // Prefer Array.prototype.some() over verbose existence checks.
+        // some() returns the intended boolean directly and avoids sentinel or
+        // truthiness mistakes in hand-written existence checks.
+        "useArraySome": "error",
+
+        // Enforce that await is only used on Promise values.
+        // Awaiting a non-thenable usually means an async call was omitted and
+        // creates a misleading lifecycle boundary.
+        "useAwaitThenable": "error",
+
+        // Enforce consistent use of it or test for test functions.
+        // The template does not use the test domain; enable this when that
+        // framework or tool is deliberately added.
+        "useConsistentTestIt": "off",
+
+        // Detects a disposable object assigned to a variable without using or await
+        // using syntax.
+        // The template has no explicit-resource-management convention; requiring
+        // `using` would impose an unchosen lifetime model.
+        "useDisposables": "off",
+
+        // Prefer .textContent over .innerText for DOM node text.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useDomNodeTextContent": "error",
+
+        // Prefer querySelector() and querySelectorAll() over older DOM query APIs.
+        // Obsidian supplies DOM helper APIs and multi-window-aware roots; a blanket
+        // preference for document query APIs is not appropriate.
+        "useDomQuerySelector": "off",
+
+        // Require switch-case statements to be exhaustive.
+        // Exhaustive handling prevents a new union or enum state from silently
+        // falling through plugin behavior.
+        "useExhaustiveSwitchCases": "error",
+
+        // Ensure that test functions contain at least one expect() or similar
+        // assertion.
+        // The template does not use the test domain; enable this when that
+        // framework or tool is deliberately added.
+        "useExpect": "off",
+
+        // Require explicit return types on functions and class methods.
+        // The existing TypeScript policy favors inference except where an API
+        // boundary benefits from an annotation.
+        "useExplicitReturnType": "off",
+
+        // Enforce types in functions, methods, variables, and parameters.
+        // Requiring annotations everywhere would fight TypeScript inference and add
+        // noise to small plugin code.
+        "useExplicitType": "off",
+
+        // Enforce that all imports appear at the top of the module.
+        // Grouped imports make Obsidian host dependencies and bundled
+        // dependencies immediately visible before implementation code.
+        "useImportsFirst": "error",
+
+        // Prefer Array#includes() over Array#indexOf() checks.
+        // includes() states membership directly and avoids incorrect comparisons
+        // against indexOf()'s -1 sentinel.
+        "useIncludes": "error",
+
+        // Prefer Math.min() and Math.max() over ternaries for simple comparisons.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useMathMinMax": "error",
+
+        // Enforce using named capture groups in regular expression.
+        // Named groups help complex regexes but are unnecessary for every small
+        // capture.
+        "useNamedCaptureGroup": "off",
+
+        // Enforce using the nullish coalescing operator (??) instead of logical or
+        // (||).
+        // Settings defaults should preserve valid false, zero, and empty-string
+        // values while replacing only null or undefined.
+        "useNullishCoalescing": "error",
+
+        // Enforce valid describe() callback.
+        // The template does not use the playwright domain; enable this when that
+        // framework or tool is deliberately added.
+        "usePlaywrightValidDescribeCallback": "off",
+
+        // Enforce that Qwik loader functions are declared in the correct location.
+        // The template does not use the qwik domain; enable this when that
+        // framework or tool is deliberately added.
+        "useQwikLoaderLocation": "off",
+
+        // Require functions with the "use server" directive to be async.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "useReactAsyncServerFunction": "off",
+
+        // Enforce a specific function type for React function components.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "useReactFunctionComponentDefinition": "off",
+
+        // Ensure that platform-specific React Native components are only imported
+        // in files named for that platform.
+        // The template does not use the reactNative domain; enable this when that
+        // framework or tool is deliberately added.
+        "useReactNativePlatformComponents": "off",
+
+        // Enforce using a type parameter on Array#reduce instead of casting the
+        // initial value.
+        // A type parameter checks each accumulator update, whereas casting the
+        // initial value can hide missing or incorrectly typed fields.
+        "useReduceTypeParameter": "error",
+
+        // Enforce RegExp#exec over String#match if no global flag is provided.
+        // For non-global patterns exec() has the same capture result while keeping
+        // regular-expression operations consistent and slightly cheaper.
+        "useRegexpExec": "error",
+
+        // Enforce the use of RegExp.prototype.test() over String.prototype.match()
+        // and RegExp.prototype.exec() in boolean contexts.
+        // test() expresses a boolean question directly and avoids allocating a
+        // match result that the condition will discard.
+        "useRegexpTest": "error",
+
+        // Enforce the sorting of CSS utility classes.
+        // The template does not use a utility-CSS framework whose class order
+        // carries a shared convention.
+        "useSortedClasses": "off",
+
+        // Prefer String#startsWith() and String#endsWith() over verbose prefix and
+        // suffix checks.
+        // Dedicated boundary methods avoid error-prone index, slice, or regular
+        // expression comparisons and state the intent directly.
+        "useStringStartsEndsWith": "error",
+
+        // Enforce that test lifecycle hooks are declared in the order they execute.
+        // The template does not use the test domain; enable this when that
+        // framework or tool is deliberately added.
+        "useTestHooksInOrder": "off",
+
+        // Enforce that lifecycle hooks appear before any test cases in the same
+        // block.
+        // The template does not use the test domain; enable this when that
+        // framework or tool is deliberately added.
+        "useTestHooksOnTop": "off",
+
+        // Enforce that class methods utilize this.
+        // Obsidian lifecycle and settings classes may implement instance methods
+        // for API shape even when a method does not read `this`.
+        "useThisInClassMethods": "off",
+
+        // Enforce the use of the u or v flag for regular expressions.
+        // Unicode mode gives code points, escapes, and character classes
+        // predictable semantics for note and metadata text.
+        "useUnicodeRegex": "error",
+
+        // Require var declarations to appear at the top of their containing scope.
+        // `noVar` is already enabled, so a placement policy for `var` declarations
+        // is irrelevant.
+        "useVarsOnTop": "off",
+
+        // Enforce consistent defineProps declaration style.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueConsistentDefinePropsDeclaration": "off",
+
+        // Enforces Promise syntax when using Vue nextTick.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueNextTickPromise": "off"
+      }
+    }
+  }
+}

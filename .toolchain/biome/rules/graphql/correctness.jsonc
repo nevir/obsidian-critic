@@ -1,0 +1,38 @@
+{
+  "linter": {
+    "rules": {
+      "correctness": {
+        // Require all argument names for fields & directives to be unique.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateArgumentNames": "error",
+
+        // Require all enum value names to be unique.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateEnumValueNames": "error",
+
+        // Require fields within an input object to be unique.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateInputFieldNames": "error",
+
+        // Require all variable definitions to be unique.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateVariableNames": "error",
+
+        // Enforce specifying the name of GraphQL operations.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useGraphqlNamedOperations": "error",
+
+        // Disallow anonymous operations when more than one operation specified in
+        // document.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useLoneAnonymousOperation": "error"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "linter": {
+    "rules": {
+      "a11y": {
+        // Make sure that we have a generic font family as a fallback.
+        "useGenericFontNames": "error"
+      }
+    }
+  }
+}

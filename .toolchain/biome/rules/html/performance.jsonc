@@ -1,0 +1,12 @@
+{
+  "linter": {
+    "rules": {
+      "performance": {
+        // Enforce opting in to Vue Vapor mode in \<script setup> blocks.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueVapor": "off"
+      }
+    }
+  }
+}

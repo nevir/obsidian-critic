@@ -1,0 +1,66 @@
+min_version = { hard = "2026.5.11", soft = "2026.6.14" }
+
+[settings]
+lockfile = true
+
+[tools]
+actionlint = "1.7"
+node = "24"
+"aqua:yarnpkg/berry" = "4"
+
+[tasks.install]
+description = "Install the locked JavaScript dependencies"
+run = "yarn install --immutable"
+sources = [
+  ".mise.toml",
+  ".yarnrc.yml",
+  "mise.lock",
+  "package.json",
+  "yarn.lock",
+]
+outputs = ["node_modules/.yarn-state.yml"]
+
+[tasks.build]
+description = "Build the production Obsidian plugin bundle"
+depends = ["install"]
+run = [
+  "yarn exec parcel build --no-source-maps",
+  "node .toolchain/check-bundle.mjs",
+]
+
+[tasks.dev]
+description = "Rebuild the plugin bundle as source files change"
+depends = ["install"]
+run = "yarn exec parcel watch"
+
+[tasks.lint]
+description = "Check formatting, lint rules, and explicit config coverage"
+depends = ["install"]
+run = [
+  "actionlint",
+  "yarn exec biome check .",
+  "node .toolchain/check-explicit-config.mjs",
+]
+
+[tasks.typecheck]
+description = "Type-check the plugin without emitting files"
+depends = ["install"]
+run = "yarn exec tsc"
+
+[tasks.versioncheck]
+description = "Check that changes declare a version and manifests agree"
+depends = ["install"]
+run = [
+  "yarn version check",
+  "node .toolchain/check-version-plan.mjs",
+  "node .toolchain/sync-version.mjs --check",
+]
+
+[tasks.check]
+description = "Run every required validation"
+depends = ["lint", "typecheck", "build"]
+
+[tasks.fix]
+description = "Apply safe Biome formatting, lint, and assist fixes"
+depends = ["install"]
+run = "yarn exec biome check --write ."

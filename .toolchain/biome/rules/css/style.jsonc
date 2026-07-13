@@ -1,0 +1,20 @@
+{
+  "linter": {
+    "rules": {
+      "style": {
+        // Nice in theory, but in practice this is too noisy.
+        "noDescendingSpecificity": "off",
+
+        // Disallow hex colors.
+        // Hex colors are valid CSS; Obsidian theme-variable usage is the meaningful
+        // policy, not a blanket color-syntax ban.
+        "noHexColors": "off",
+
+        // Disallow use of @value rule in CSS modules.
+        // @value is nonstandard CSS Modules syntax; Obsidian loads the emitted
+        // stylesheet as plain CSS, so this template rejects it.
+        "noValueAtRule": "error"
+      }
+    }
+  }
+}

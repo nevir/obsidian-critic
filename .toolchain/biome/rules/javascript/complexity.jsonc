@@ -1,0 +1,191 @@
+{
+  "linter": {
+    "rules": {
+      "complexity": {
+        // Multiple spaces are very difficult to notice.
+        "noAdjacentSpacesInRegex": "error",
+
+        // Prefer `...args` over `arguments`.
+        "noArguments": "error",
+
+        // Avoid boxed types like Number (vs number) and {}; they're common
+        // misconceptions when coming from other languages (e.g. Java).
+        "noBannedTypes": "error",
+
+        // You almost certainly didn't intend to use the comma operator.
+        "noCommaOperator": "error",
+
+        // Disallow equal signs explicitly at the beginning of regular expressions.
+        // A leading equals sign makes a regular expression resemble the /=
+        // operator, so rejecting it avoids ambiguity for readers.
+        "noDivRegex": "error",
+
+        // Gotta have at least one type parameter.
+        "noEmptyTypeParameters": "error",
+
+        // While this is nice in theory, it is difficult to find a pragmatic
+        // threshold in practice.
+        "noExcessiveCognitiveComplexity": "off",
+
+        // Restrict the number of lines of code in a function.
+        // The threshold is subjective and should follow real plugin size data
+        // rather than constrain a reusable starter.
+        "noExcessiveLinesPerFunction": "off",
+
+        // While this is nice in theory, it is difficult to find a pragmatic
+        // threshold in practice.
+        "noExcessiveNestedTestSuites": "off",
+
+        // Use ! or !! rather than the boxed type.
+        "noExtraBooleanCast": "error",
+
+        // You can use flat() instead.
+        "noFlatMapIdentity": "error",
+
+        // for … of is part of the language now; we prefer it.
+        "noForEach": "error",
+
+        // Encourage use of explicit type conversion functions over their shorthand
+        // counterparts.
+        // The existing policy intentionally permits concise boolean coercion such
+        // as `!!value`; this rule would conflict with it.
+        "noImplicitCoercions": "off",
+
+        // Checks if a default export exports the same symbol as a named export.
+        // Exporting one symbol under both identities creates competing import
+        // styles and an unnecessarily ambiguous module API.
+        "noRedundantDefaultExport": "error",
+
+        // This is often a vestige of coming from a more strongly OOP-based
+        // language. It's not necessary in JavaScript; you can use a plain
+        // object instead.
+        "noStaticOnlyClass": "error",
+
+        // It can be useful to reference the class from a static method,
+        // especially to avoid refactoring errors in the future.
+        "noThisInStatic": "off",
+
+        // Avoid rethrows that have no behavioral change.
+        "noUselessCatch": "error",
+
+        // Disallow unused catch bindings.
+        // Omitting an unused binding makes it clear that the error value is
+        // intentionally ignored rather than accidentally unhandled.
+        "noUselessCatchBinding": "error",
+
+        // Avoid constructors that do nothing.
+        "noUselessConstructor": "error",
+
+        // Only use continue when it changes control flow.
+        "noUselessContinue": "error",
+
+        // Likely indicates an incomplete refactor.
+        "noUselessEmptyExport": "error",
+
+        // Only escape when necessary.
+        "noUselessEscapeInRegex": "error",
+
+        // We only want to use React fragments when necessary.
+        "noUselessFragments": "error",
+
+        // Really, you shouldn't be using labels at all. But if you are…
+        "noUselessLabel": "error",
+
+        // Likely indicates an incomplete refactor.
+        "noUselessLoneBlockStatements": "error",
+
+        // Likely indicates an incomplete refactor.
+        "noUselessRename": "error",
+
+        // Disallow redundant return statements.
+        // Redundant returns add false control-flow significance and make
+        // lifecycle callbacks harder to scan.
+        "noUselessReturn": "error",
+
+        // Combine those string literals!
+        "noUselessStringConcat": "error",
+
+        // Only use String.raw when you need it.
+        "noUselessStringRaw": "error",
+
+        // Enforce that default is the last case in a switch statement.
+        "noUselessSwitchCase": "error",
+
+        // Prefer logical operators when possible.
+        "noUselessTernary": "error",
+
+        // Stay to `this`, unless you absolutely need to alias it.
+        "noUselessThisAlias": "error",
+
+        // Type constraints should narrow the type in some way.
+        "noUselessTypeConstraint": "error",
+
+        // Disallow the use of useless undefined.
+        // Redundant undefined values obscure optional return and initialization
+        // behavior without changing the result.
+        "noUselessUndefined": "error",
+
+        // Prefer implicit initialization to `undefined`.
+        "noUselessUndefinedInitialization": "error",
+
+        // Void is often misunderstood, and more fancy than we need.
+        "noVoid": "error",
+
+        // Enforce the use of Array.prototype.find() over Array.prototype.filter()
+        // followed by [0] when looking for a single result.
+        // find() states the single-match intent and stops scanning as soon as a
+        // match is found instead of allocating an intermediate array.
+        "useArrayFind": "error",
+
+        // Prefer arrow functions unless they're not appropriate (e.g. we need
+        // to reference `this`, or are defining a generator).
+        //
+        // Though, this rule may prove to be too restrictive?
+        "useArrowFunction": "error",
+
+        // Prefer the modern Date.now() vs new Date().getTime().
+        "useDateNow": "error",
+
+        // Consistent style, and potential memory optimization.
+        "useFlatMap": "error",
+
+        // Prefer Array#{indexOf,lastIndexOf}() over
+        // Array#{findIndex,findLastIndex}() when looking for the index of an item.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useIndexOf": "error",
+
+        // Conflicts with TypeScript's noPropertyAccessFromIndexSignature.
+        //
+        // We like to be explicit when we're referencing known properties vs
+        // indexing into a container.
+        "useLiteralKeys": "off",
+
+        // Enforce a maximum number of parameters in function definitions.
+        // The threshold is subjective and should follow real plugin size data
+        // rather than constrain a reusable starter.
+        "useMaxParams": "off",
+
+        // No need to parseInt something that can be a literal.
+        "useNumericLiterals": "error",
+
+        // Simplify chained comparisons via the Elvis operator.
+        "useOptionalChain": "error",
+
+        // We reserve use of the `RegExp` constructor only for dynamic regular
+        // expressions.
+        "useRegexLiterals": "error",
+
+        // Avoid keys that resolve to something other than their literal form.
+        "useSimpleNumberKeys": "error",
+
+        // Avoid expressions that are statically resolved and discard part of
+        // the expression.
+        "useSimplifiedLogicExpression": "off",
+
+        // Simplify for loops to while loops when possible.
+        "useWhile": "error"
+      }
+    }
+  }
+}

@@ -1,0 +1,95 @@
+name: Publish release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  publish:
+    name: Build, attest, and publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the release tag
+        uses: actions/checkout@v7
+
+      - name: Install the locked toolchain
+        uses: jdx/mise-action@v4
+        with:
+          cache: true
+          install: true
+          version: 2026.6.14
+
+      - name: Locate the Yarn package cache
+        id: yarn-cache
+        run: echo "directory=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Yarn package cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.yarn-cache.outputs.directory }}
+          key: yarn-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('mise.lock', 'yarn.lock') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Verify the release tag
+        id: version
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [[ "$GITHUB_REF_TYPE" != 'tag' || "$GITHUB_REF_NAME" != "$version" ]]; then
+            echo "::error::Run this workflow from tag $version."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build the release bundle
+        run: mise run build
+
+      - name: Require an unpublished release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "$VERSION" > /dev/null 2>&1; then
+            echo "::error::Release $VERSION already exists."
+            exit 1
+          fi
+
+      - name: Check for optional styles
+        id: styles
+        shell: bash
+        run: |
+          if [[ -f styles.css ]]; then
+            echo 'exists=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'exists=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Attest the release bundle
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+            ${{ steps.styles.outputs.exists == 'true' && 'styles.css' || '' }}
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          assets=(main.js manifest.json)
+          if [[ -f styles.css ]]; then
+            assets+=(styles.css)
+          fi
+
+          gh release create "$VERSION" "${assets[@]}" \
+            --generate-notes \
+            --title "$VERSION" \
+            --verify-tag

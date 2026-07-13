@@ -1,0 +1,43 @@
+{
+  "linter": {
+    "rules": {
+      "correctness": {
+        // Common class of mistake when using linear-gradient().
+        "noInvalidDirectionInLinearGradient": "error",
+
+        // Ensure that grid areas are valid.
+        "noInvalidGridAreas": "error",
+
+        // @import rules must be before all other rules.
+        "noInvalidPositionAtImportRule": "error",
+
+        // Make sure you use var() when referencing CSS variables.
+        "noMissingVarFunction": "error",
+
+        // Make sure we use known CSS functions.
+        "noUnknownFunction": "error",
+
+        // Make sure we use known media features.
+        "noUnknownMediaFeatureName": "error",
+
+        // Make sure we use known CSS properties.
+        "noUnknownProperty": "error",
+
+        // Ensure that we use known CSS :pseudo-classes.
+        "noUnknownPseudoClass": "error",
+
+        // Ensure that we use known CSS ::pseudo-elements.
+        "noUnknownPseudoElement": "error",
+
+        // Ensure that we select known elements.
+        "noUnknownTypeSelector": "error",
+
+        // Make sure we use known CSS units.
+        "noUnknownUnit": "error",
+
+        // Catch selectors that cannot match any elements.
+        "noUnmatchableAnbSelector": "error"
+      }
+    }
+  }
+}

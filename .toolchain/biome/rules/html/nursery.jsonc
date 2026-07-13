@@ -1,0 +1,29 @@
+{
+  "linter": {
+    "rules": {
+      "nursery": {
+        // Disallow deprecated number modifiers on Vue v-on directives.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueVOnNumberValues": "off",
+
+        // Enforce that \<style> blocks in Vue SFCs have the scoped attribute and
+        // that \<style> blocks in Astro components do not have the is:global
+        // directive.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useScopedStyles": "off",
+
+        // Require keyed {#each} blocks in Svelte templates.
+        // The template does not use the svelte domain; enable this when that
+        // framework or tool is deliberately added.
+        "useSvelteRequireEachKey": "off",
+
+        // Enforces valid v-for directives in Vue templates.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueValidVFor": "off"
+      }
+    }
+  }
+}

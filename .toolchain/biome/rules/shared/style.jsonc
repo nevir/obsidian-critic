@@ -1,0 +1,12 @@
+{
+  "linter": {
+    "rules": {
+      "style": {
+        // Restrict the number of lines in a file.
+        // The threshold is subjective and should follow real plugin size data
+        // rather than constrain a reusable starter.
+        "noExcessiveLinesPerFile": "off"
+      }
+    }
+  }
+}

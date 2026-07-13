@@ -1,0 +1,46 @@
+{
+  "linter": {
+    "rules": {
+      "suspicious": {
+        // Disallow deprecated media types.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDeprecatedMediaType": "error",
+
+        // Make sure we're not double-importing CSS modules.
+        "noDuplicateAtImportRules": "error",
+
+        // Disallow duplicate custom properties within declaration blocks.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateCustomProperties": "error",
+
+        // Keep font lists clean.
+        "noDuplicateFontNames": "error",
+
+        // Disallow duplicate properties within declaration blocks.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateProperties": "error",
+
+        // Duplicate keyframe selectors silently replace earlier declarations
+        // and usually indicate a copy/paste mistake.
+        "noDuplicateSelectorsKeyframeBlock": "error",
+
+        // CSS blocks should have rules.
+        "noEmptyBlock": "error",
+
+        // Not supported by all browsers.
+        "noImportantInKeyframe": "error",
+
+        // Shorthands can override more explicit properties.
+        "noShorthandPropertyOverrides": "error",
+
+        // Disallow unknown at-rules.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noUnknownAtRules": "error"
+      }
+    }
+  }
+}

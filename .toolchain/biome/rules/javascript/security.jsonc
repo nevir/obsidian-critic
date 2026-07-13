@@ -1,0 +1,28 @@
+{
+  "linter": {
+    "rules": {
+      "security": {
+        // target="_blank" MUST be paired with rel="noreferrer" or
+        // rel="noopener", otherwise we've got a security vulnerability on our
+        // hands.
+        "noBlankTarget": "error",
+
+        // Prevent a class of XSS attacks.
+        "noDangerouslySetInnerHtml": "error",
+
+        // The broader noDangerouslySetInnerHtml rule rejects every use, making
+        // this children-specific diagnostic redundant.
+        "noDangerouslySetInnerHtmlWithChildren": "off",
+
+        // Dynamic global evaluation bypasses static analysis and can execute
+        // vault-controlled strings with the plugin's full privileges.
+        "noGlobalEval": "error",
+
+        // Disallow usage of sensitive data such as API keys and tokens.
+        // Plugin code runs inside a user’s vault and renders user-facing UI, so
+        // this low-noise safety check should fail CI.
+        "noSecrets": "error"
+      }
+    }
+  }
+}

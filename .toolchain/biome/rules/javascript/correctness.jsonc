@@ -1,0 +1,280 @@
+{
+  "linter": {
+    "rules": {
+      "correctness": {
+        // Prevent usage of next/script's beforeInteractive strategy outside of
+        // pages/_document.js in a Next.js project.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "noBeforeInteractiveScriptOutsideDocument": "off",
+
+        // Pass children via JSX syntax, not as a prop.
+        "noChildrenProp": "error",
+
+        // Catch cases where we might have an expression that appears useful
+        // but isn't.
+        "noConstantCondition": "error",
+
+        // Avoid using Math.min, Math.max when the result is constant.
+        "noConstantMathMinMaxClamp": "error",
+
+        // Biome still catches writes hidden behind a TypeScript assertion, so
+        // it closes a deliberate escape hatch in the compiler check.
+        "noConstAssign": "error",
+
+        // Likely indicates an incomplete refactor.
+        "noConstructorReturn": "error",
+
+        // Likely indicates an incomplete refactor.
+        "noEmptyCharacterClassInRegex": "error",
+
+        // If you're going to destructure something, best make it useful.
+        "noEmptyPattern": "error",
+
+        // Disallow the use of __dirname and __filename in the global scope.
+        // In bundled code these globals describe the emitted bundle rather than
+        // the source module, making path calculations fragile.
+        "noGlobalDirnameFilename": "error",
+
+        // Already handled by TypeScript.
+        "noGlobalObjectCalls": "off",
+
+        // In modules Biome only adds coverage for nested var declarations;
+        // noVar already rejects those, while block-scoped functions are valid.
+        "noInnerDeclarations": "off",
+
+        // Already handled by TypeScript, but Biome's message is more helpful.
+        "noInvalidBuiltinInstantiation": "error",
+
+        // Biome validates asserted base classes that TypeScript treats as any,
+        // catching invalid super() construction the compiler permits.
+        "noInvalidConstructorSuper": "error",
+
+        // TypeScript catches temporal-dead-zone cases and noVar removes its
+        // uncovered var-before-declaration case.
+        "noInvalidUseBeforeDeclaration": "off",
+
+        // Disallows defining React components inside other components.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noNestedComponentDefinitions": "off",
+
+        // Prevent client components from being async functions.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "noNextAsyncClientComponent": "off",
+
+        // Build scripts use Node; the base override enables this rule for
+        // cross-platform plugin source under src/.
+        "noNodejsModules": "off",
+
+        // Already handled by TypeScript.
+        "noNonoctalDecimalEscape": "off",
+
+        // Rounded numeric literals silently change IDs and calculations before
+        // runtime, so precision loss must fail the build.
+        "noPrecisionLoss": "error",
+
+        // This template has no package-specific private import boundaries to
+        // enforce; dependencies define their own public exports.
+        "noPrivateImports": "off",
+
+        // The process global does not exist on mobile; Node-based build tools
+        // should import the facilities they use explicitly.
+        "noProcessGlobal": "error",
+
+        // Disallow useVisibleTask$() functions in Qwik components.
+        // The template does not use the qwik domain; enable this when that
+        // framework or tool is deliberately added.
+        "noQwikUseVisibleTask": "off",
+
+        // Disallow assigning to React component props.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noReactPropAssignments": "off",
+
+        // Handled by react-dom's typings.
+        "noRenderReturnValue": "off",
+
+        // Disallow the use of configured elements.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "noRestrictedElements": "off",
+
+        // Likely indicates an incomplete refactor.
+        "noSelfAssign": "error",
+
+        // Already handled by TypeScript.
+        "noSetterReturn": "off",
+
+        // Disallow destructuring props inside JSX components in Solid projects.
+        // The template does not use the solid domain; enable this when that
+        // framework or tool is deliberately added.
+        "noSolidDestructuredProps": "off",
+
+        // Catch cases where we're comparing to a case that will never exist.
+        "noStringCaseMismatch": "error",
+
+        // A lexical declaration directly in a case is scoped to the entire
+        // switch and can be accessed uninitialized from another case.
+        "noSwitchDeclarations": "error",
+
+        // Avoid implicitly relying on transitive dependencies.
+        "noUndeclaredDependencies": "error",
+
+        // Already handled by TypeScript.
+        "noUndeclaredVariables": "off",
+
+        // Already handled by TypeScript.
+        "noUnreachable": "off",
+
+        // TypeScript checks basic super() placement but not that every
+        // constructor path calls it exactly once.
+        "noUnreachableSuper": "error",
+
+        // Warn when importing non-existing exports.
+        // A missing path or export prevents the plugin bundle from loading, so
+        // it must fail during local validation.
+        "noUnresolvedImports": "error",
+
+        // Returning/throwing values from finally is likely to trip you up.
+        "noUnsafeFinally": "error",
+
+        // Catch cases where optional chaining may cause us to throw.
+        "noUnsafeOptionalChaining": "error",
+
+        // Already handled by TypeScript.
+        "noUnusedFunctionParameters": "off",
+
+        // Biome catches empty import clauses that TypeScript accepts and can
+        // also remove unused imports safely.
+        "noUnusedImports": "error",
+
+        // Disallow new operators outside of assignments or comparisons.
+        // Discarding a constructed value usually means an assignment was lost;
+        // intentional registration side effects should be explicit.
+        "noUnusedInstantiation": "error",
+
+        // TypeScript also rejects unused labels, while keeping Biome enabled
+        // catches them in lint-only runs and keeps JS and TS policy aligned.
+        "noUnusedLabels": "error",
+
+        // TypeScript treats writes as usage, while Biome can identify private
+        // members that are updated but never read.
+        "noUnusedPrivateClassMembers": "error",
+
+        // TypeScript misses some write-only and self-referential values that
+        // Biome can identify as unused.
+        "noUnusedVariables": "error",
+
+        // Avoid misuse of elements that do not support children.
+        "noVoidElementsWithChildren": "error",
+
+        // If you have a void reeturn type, you should not return anything.
+        "noVoidTypeReturn": "error",
+
+        // Enforce that Vue component data options are declared as functions.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueDataObjectDeclaration": "off",
+
+        // Disallow duplicate keys in Vue component data, methods, computed
+        // properties, and other options.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueDuplicateKeys": "off",
+
+        // Disallow reserved keys in Vue component data and computed properties.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueReservedKeys": "off",
+
+        // Disallow reserved names to be used as props.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueReservedProps": "off",
+
+        // Disallow destructuring of props passed to setup in Vue projects.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueSetupPropsReactivityLoss": "off",
+
+        // Make sure that we're correctly including referenced values in
+        // useMemo, etc.
+        "useExhaustiveDependencies": "error",
+
+        // No hooks in conditions.
+        "useHookAtTopLevel": "error",
+
+        // Enforces that \<img> elements have both width and height attributes.
+        // The template does not use the qwik domain; enable this when that
+        // framework or tool is deliberately added.
+        "useImageSize": "off",
+
+        // Parcel and TypeScript's Bundler resolution intentionally support
+        // extensionless relative imports.
+        "useImportExtensions": "off",
+
+        // Enforce id attribute on next/script components with inline content or
+        // dangerouslySetInnerHTML.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "useInlineScriptId": "off",
+
+        // TypeScript catches direct NaN equality but misses equivalent switch
+        // cases; Number.isNaN() is correct in every context.
+        "useIsNan": "error",
+
+        // Enforces the use of with { type: "json" } for JSON module imports.
+        // Import attributes declare that data is JSON and keep source semantics
+        // compatible with modern module loaders.
+        "useJsonImportAttributes": "error",
+
+        // Catch cases where we forget a key attribute on a JSX element.
+        "useJsxKeyInIterable": "error",
+
+        // Enforce the consistent use of the radix argument when using parseInt().
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useParseIntRadix": "error",
+
+        // Prefer using the class prop as a classlist over the classnames helper.
+        // The template does not use the qwik domain; enable this when that
+        // framework or tool is deliberately added.
+        "useQwikClasslist": "off",
+
+        // Disallow use* hooks outside of component$ or other use* hooks in Qwik
+        // applications.
+        // The template does not use the qwik domain; enable this when that
+        // framework or tool is deliberately added.
+        "useQwikMethodUsage": "off",
+
+        // Disallow unserializable expressions in Qwik dollar ($) scopes.
+        // The template does not use the qwik domain; enable this when that
+        // framework or tool is deliberately added.
+        "useQwikValidLexicalScope": "off",
+
+        // Enforce JSDoc comment lines to start with a single asterisk, except for
+        // the first one.
+        // A consistent JSDoc margin keeps editor documentation readable and
+        // makes malformed comment lines apparent during review.
+        "useSingleJsDocAsterisk": "error",
+
+        // Prevent the usage of static string literal id attribute on elements.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "useUniqueElementIds": "off",
+
+        // Catch cases where we're iterating in the wrong direction.
+        "useValidForDirection": "error",
+
+        // Biome rejects misspelled typeof strings even when an assertion makes
+        // the compiler accept the comparison.
+        "useValidTypeof": "error",
+
+        // If you are authoring a generator, make sure it yields something.
+        "useYield": "error"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "linter": {
+    "rules": {
+      "nursery": {
+        // Require all fields of a type to be unique.
+        // Duplicate schema fields are ambiguous to validation and generated
+        // client types, so the document must fail immediately.
+        "noDuplicateFieldDefinitionNames": "error"
+      }
+    }
+  }
+}

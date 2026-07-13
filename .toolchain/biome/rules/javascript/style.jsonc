@@ -1,0 +1,384 @@
+{
+  "linter": {
+    "rules": {
+      "style": {
+        // Disallow use of CommonJs module system in favor of ESM style imports.
+        // ESM gives Parcel a statically analyzable source graph even though the
+        // final Obsidian bundle is emitted as CommonJS.
+        "noCommonJs": "error",
+
+        // Disallow continue statements.
+        // A targeted `continue` can keep plugin lifecycle and traversal code
+        // flatter and clearer.
+        "noContinue": "off",
+
+        // While we agree with default exports being awkward in IDEs, there
+        // are cases where default exports are the ergonomic choice for an API,
+        // and editors are getting better at handling them.
+        "noDefaultExport": "off",
+
+        // Use async functions over callbacks in tests.
+        "noDoneCallback": "error",
+
+        // Disallow TypeScript enum.
+        // The existing policy explicitly supports enums while requiring stable
+        // literal values for persisted settings.
+        "noEnum": "off",
+
+        // Enforce a maximum number of classes per file.
+        // The threshold is subjective and should follow real plugin size data
+        // rather than constrain a reusable starter.
+        "noExcessiveClassesPerFile": "off",
+
+        // Disallow exporting an imported variable.
+        // A direct re-export keeps the dependency visible in the module API and
+        // avoids creating an unnecessary local binding.
+        "noExportedImports": "error",
+
+        // Prevent usage of \<head> element in a Next.js project.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "noHeadElement": "off",
+
+        // We prefer implicit booleans.
+        "noImplicitBoolean": "off",
+
+        // Disallows the usage of the unary operators ++ and --.
+        // Increment and decrement remain the clearest operations in conventional
+        // loops.
+        "noIncrementDecrement": "off",
+
+        // Let TypeScript infer types whenever possible.
+        "noInferrableTypes": "error",
+
+        // Disallow string literals inside JSX elements.
+        // The template does not use JSX or an internationalization system that
+        // would justify banning literal UI text.
+        "noJsxLiterals": "off",
+
+        // Reports usage of "magic numbers" — numbers used directly instead of being
+        // assigned to named constants.
+        // The threshold is subjective and should follow real plugin size data
+        // rather than constrain a reusable starter.
+        "noMagicNumbers": "off",
+
+        // Disallow use of chained assignment expressions.
+        // Chained mutation obscures evaluation order and can accidentally share
+        // one value across bindings with different intended types.
+        "noMultiAssign": "error",
+
+        // Disallow creating multiline strings by escaping newlines.
+        // Escaped newlines make whitespace and continuation behavior difficult
+        // to see; template literals express multiline text directly.
+        "noMultilineString": "error",
+
+        // Namespaces can be helpful for some organization strategies.
+        "noNamespace": "off",
+
+        // When you've got a multi-case negated condition, prefer the
+        // un-negated version (no one likes double negatives).
+        "noNegationElse": "error",
+
+        // Disallow nested ternary expressions.
+        // Nested conditional expressions conceal branching; explicit control
+        // flow is easier to review and modify safely.
+        "noNestedTernary": "error",
+
+        // Pragmatically, there are cases where we can safely assume that a
+        // value or property exists, and a non-null assertion leads to the
+        // most readable code.
+        "noNonNullAssertion": "off",
+
+        // Parameter assignment can be helpful for things like complex
+        // defaults.
+        "noParameterAssign": "off",
+
+        // Parameter properties are a helpful shorthand.
+        "noParameterProperties": "off",
+
+        // Disallow the use of process.env.
+        // Installed plugins cannot rely on a developer shell environment, so
+        // runtime configuration must come from explicit plugin settings.
+        "noProcessEnv": "error",
+
+        // We prefer to manage this via TypeScript types.
+        "noRestrictedGlobals": "off",
+
+        // Disallow specified modules when loaded by import or require.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "noRestrictedImports": "off",
+
+        // Disallow user defined types.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "noRestrictedTypes": "off",
+
+        // If the value is a constant, use its literal form.
+        "noShoutyConstants": "error",
+
+        // Enforce the use of String.slice() over String.substr() and
+        // String.substring().
+        // slice() has one consistent modern API and avoids the legacy or subtly
+        // different index semantics of the alternatives.
+        "noSubstr": "error",
+
+        // Disallow ternary operators.
+        // Simple conditional expressions are concise and readable; only nested
+        // ternaries are rejected.
+        "noTernary": "off",
+
+        // We like to use template literals to indicate human-visible text.
+        "noUnusedTemplateLiteral": "off",
+
+        // We prefer flat style functions over nested functions.
+        "noUselessElse": "error",
+
+        // Disallow the use of Vue Options API.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueOptionsApi": "off",
+
+        // Speak regularly, we do.
+        "noYodaExpression": "error",
+
+        // Prefer array literals vs constructing arrays.
+        "useArrayLiterals": "error",
+
+        // Use as const when possible to lock in literal types.
+        "useAsConstAssertion": "error",
+
+        // Use at() instead of integer index access.
+        // Direct indexed access works with `noUncheckedIndexedAccess`; forcing
+        // `.at()` would be a style-only rewrite.
+        "useAtIndex": "off",
+
+        // We commonly prefer to use blockless statements for early returns
+        // (flat functions).
+        "useBlockStatements": "off",
+
+        // Sometimes nested conditionals are helpful to explain consistent
+        // structures.
+        "useCollapsedElseIf": "off",
+
+        // Enforce using single if instead of nested if clauses.
+        // Keeping nested guards can make separate preconditions clearer; the
+        // existing config makes the same tradeoff for `else if`.
+        "useCollapsedIf": "off",
+
+        // Enforce declaring components only within modules that export React
+        // Components exclusively.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "useComponentExportOnlyModules": "off",
+
+        // Prefer shorthand[] array types.
+        "useConsistentArrayType": {
+          "level": "error",
+          "options": {
+            "syntax": "shorthand"
+          }
+        },
+
+        // Enforce consistent arrow function bodies.
+        // Expression and block bodies should follow local clarity rather than one
+        // project-wide form.
+        "useConsistentArrowReturn": "off",
+
+        // Use new for built-in types, except for boxed types.
+        "useConsistentBuiltinInstantiation": "error",
+
+        // This rule enforces consistent use of curly braces inside JSX attributes
+        // and JSX children.
+        // This is a preference rather than a clear correctness requirement for a
+        // small Obsidian plugin; keep it explicit but off.
+        "useConsistentCurlyBraces": "off",
+
+        // Disallow enums from having both number and string members.
+        // Homogeneous enum values serialize predictably when stored in plugin
+        // settings and avoid mixed comparison behavior.
+        "useConsistentEnumValueType": "error",
+
+        // Require consistent accessibility modifiers on class properties and
+        // methods.
+        // Consistent modifiers make the public surface of plugin classes
+        // explicit instead of leaving access expectations implicit.
+        "useConsistentMemberAccessibility": "error",
+
+        // Enforce consistent use of either method signatures or function properties
+        // within interfaces and type aliases.
+        // The two forms have different parameter-variance behavior in
+        // TypeScript, so mixing them can change assignability unexpectedly.
+        "useConsistentMethodSignatures": "error",
+
+        // Require the consistent declaration of object literals.
+        // Interfaces and object type aliases serve different extension and
+        // composition needs.
+        "useConsistentObjectDefinitions": "off",
+
+        // Enforce type definitions to consistently use either interface or type.
+        // Interfaces and type aliases are both useful in a plugin API and should be
+        // chosen by semantics.
+        "useConsistentTypeDefinitions": "off",
+
+        // If we never assign a variable, prefer declare it as const.
+        "useConst": "error",
+
+        // Defaults parameters really only make sense this way.
+        "useDefaultParameterLast": "error",
+
+        // Exhaustive switches over discriminated unions should omit a default
+        // so TypeScript can expose a newly added, unhandled variant.
+        "useDefaultSwitchClause": "off",
+
+        // Require destructuring from arrays and/or objects.
+        // Destructuring can obscure ownership or mutation; require it only where it
+        // improves the local code.
+        "useDestructuring": "off",
+
+        // Our enums very frequently are intended to be persisted, so it's best
+        // that we are explicit about their values.
+        "useEnumInitializers": "error",
+
+        // Enforce that new Error() is thrown with the original error as cause.
+        // Preserving the cause keeps the original stack and context available
+        // when plugin load or settings operations wrap a failure.
+        "useErrorCause": "error",
+
+        // Is nice in theory, but is hard to enfoce consistently without type
+        // inference.
+        "useExplicitLengthCheck": "off",
+
+        // The language has built-in support for exponentation these days.
+        "useExponentiationOperator": "error",
+
+        // Require that all exports are declared after all non-export statements.
+        // Keeping an export beside its declaration is often easier to navigate in
+        // small plugin modules.
+        "useExportsLast": "off",
+
+        // Allows compilers to optimize types out without type information.
+        "useExportType": "error",
+
+        // Doesn't have enough control to express the rules we want (yet).
+        "useFilenamingConvention": "off",
+
+        // Prefer for … of over for … in.
+        "useForOf": "error",
+
+        // Use <> over <React.Fragment>.
+        "useFragmentSyntax": "error",
+
+        // Enforce the use of globalThis over window, self, and global.
+        // Obsidian can open multiple windows; code should use the correct `Window`
+        // or `activeWindow`, not a blanket `globalThis`.
+        "useGlobalThis": "off",
+
+        // Enforce that getters and setters for the same property are adjacent in
+        // class and object definitions.
+        // Keeping an accessor pair together makes its shared invariant visible
+        // and prevents one half from being overlooked during changes.
+        "useGroupedAccessorPairs": "error",
+
+        // Allows compilers to optimize types out without type information.
+        "useImportType": "error",
+
+        // Don't get fancy with enum values; it can also lead to confusion
+        // where TypeScript enums are not compatible even with the same value.
+        "useLiteralEnumMembers": "error",
+
+        // Follow community norms for naming things.
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": false
+          }
+        },
+
+        // In Node-based build tools, the strict entry point avoids legacy
+        // coercive assertion aliases and makes equality predictable.
+        "useNodeAssertStrict": "error",
+
+        // Node-based build tools should use the node: protocol so built-ins are
+        // distinguishable from packages; src/ imports are forbidden separately.
+        "useNodejsImportProtocol": "error",
+
+        // Use Number.* instead of their global counterparts.
+        "useNumberNamespace": "error",
+
+        // Enforce the use of numeric separators in numeric literals.
+        // Separators make large durations, byte counts, and identifiers easier
+        // to verify without miscounting digits.
+        "useNumericSeparators": "error",
+
+        // Prefer object spread over Object.assign() when constructing new objects.
+        // Object spread makes the new-object intent and property precedence
+        // visible without Object.assign() mutation ambiguity.
+        "useObjectSpread": "error",
+
+        // Enforce that components are defined as functions and never as classes.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "useReactFunctionComponents": "off",
+
+        // Enforce marking members as readonly if they are never modified outside
+        // the constructor.
+        // readonly records constructor-established plugin invariants and blocks
+        // accidental service or settings-reference replacement.
+        "useReadonlyClassProperties": "error",
+
+        // Prefer <div /> over <div></div>
+        "useSelfClosingElements": "error",
+
+        // Prefer a += 1 over a = a + 1
+        "useShorthandAssign": "error",
+
+        // When possible, use shorthand function types instead of interfaces.
+        "useShorthandFunctionType": "error",
+
+        // One declaration per line.
+        "useSingleVarDeclarator": "error",
+
+        // Enforce the use of the spread operator over .apply().
+        // Spread preserves TypeScript's argument inference and is clearer than
+        // manually supplying an apply() receiver.
+        "useSpreadOverApply": "error",
+
+        // Require a description parameter for the Symbol().
+        // Descriptions make symbol values identifiable in logs and debugger
+        // output when diagnosing plugin behavior.
+        "useSymbolDescription": "error",
+
+        // Prefer template strings over concatenation.
+        "useTemplate": "error",
+
+        // Already covered by useConsistentBuiltinInstantiation
+        "useThrowNewError": "off",
+
+        // Let's not use exceptions for control flow.
+        "useThrowOnlyError": "error",
+
+        // Enforce the use of String.trimStart() and String.trimEnd() over
+        // String.trimLeft() and String.trimRight().
+        // The standardized direction names avoid legacy aliases and match the
+        // rest of the modern String API.
+        "useTrimStartEnd": "error",
+
+        // Disallow overload signatures that can be unified into a single signature.
+        // One unified signature is easier to keep aligned with its implementation
+        // and prevents redundant overloads from drifting apart.
+        "useUnifiedTypeSignatures": "error",
+
+        // Enforce specific order of Vue compiler macros.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueDefineMacrosOrder": "off",
+
+        // Enforce multi-word component names in Vue components.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "useVueMultiWordComponentNames": "off"
+      }
+    }
+  }
+}

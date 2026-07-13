@@ -1,0 +1,59 @@
+{
+  "linter": {
+    "rules": {
+      "performance": {
+        // Avoid accidential O(n^2) when you expected O(n).
+        "noAccumulatingSpread": "error",
+
+        // Disallow await inside loops.
+        // Vault operations are often intentionally sequential to preserve order or
+        // avoid concurrent writes.
+        "noAwaitInLoops": "off",
+
+        // There are cases where we want this, especially in libraries.
+        "noBarrelFile": "off",
+
+        // In general, we want to avoid busting the VM's shape cache.
+        "noDelete": "error",
+
+        // Dynamic references to an import tend to break bundler optimizations.
+        "noDynamicNamespaceImportAccess": "error",
+
+        // This is not a Next.js project.
+        "noImgElement": "off",
+
+        // Disallow .bind(), arrow functions, or function expressions in JSX props.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noJsxPropsBind": "off",
+
+        // Can be helpful for readability and dynamic referencing.
+        "noNamespaceImport": "off",
+
+        // There are cases where we want this, especially in libraries.
+        "noReExportAll": "off",
+
+        // Prevent duplicate polyfills from Polyfill.io.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "noUnwantedPolyfillio": "off",
+
+        // Ensure the preconnect attribute is used when using Google Fonts.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "useGoogleFontPreconnect": "off",
+
+        // Enforce using Solid's \<For /> component for mapping an array to JSX
+        // elements.
+        // The template does not use the solid domain; enable this when that
+        // framework or tool is deliberately added.
+        "useSolidForComponent": "off",
+
+        // This nice in theory, but in practice there are cases where we want
+        // to have inline regexes to reduce import performance or to
+        // improve readability.
+        "useTopLevelRegex": "off"
+      }
+    }
+  }
+}

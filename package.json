@@ -1,0 +1,76 @@
+{
+  "name": "obsidian-plugin-template",
+  "version": "0.1.1",
+  "private": true,
+  "scripts": {
+    "build": "mise run build",
+    "dev": "mise run dev",
+    "fix": "mise run fix",
+    "test": "mise run check"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "targets": {
+    "default": {
+      "source": "src/main.ts",
+      "distDir": ".",
+      "isLibrary": true,
+      "context": "browser",
+      "engines": {
+        "browsers": [
+          "Chrome >= 85",
+          "iOS >= 14.5"
+        ]
+      },
+      "outputFormat": "commonjs",
+      "optimize": true,
+      "includeNodeModules": {
+        "@codemirror/autocomplete": false,
+        "@codemirror/collab": false,
+        "@codemirror/commands": false,
+        "@codemirror/language": false,
+        "@codemirror/lint": false,
+        "@codemirror/search": false,
+        "@codemirror/state": false,
+        "@codemirror/view": false,
+        "@lezer/common": false,
+        "@lezer/highlight": false,
+        "@lezer/lr": false,
+        "electron": false,
+        "obsidian": false
+      },
+      "sourceMap": {
+        "inline": true
+      }
+    }
+  },
+  "packageManager": "yarn@4.17.0",
+  "dependenciesMeta": {
+    "@swc/core": {
+      "built": true
+    },
+    "lmdb": {
+      "built": true
+    },
+    "msgpackr-extract": {
+      "built": true
+    }
+  },
+  "resolutions": {
+    "@codemirror/state": "6.5.0"
+  },
+  "peerDependencies": {
+    "@codemirror/state": "6.5.0",
+    "@codemirror/view": "6.38.6",
+    "obsidian": "1.12.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.2",
+    "@codemirror/state": "6.5.0",
+    "@codemirror/view": "6.38.6",
+    "obsidian": "1.12.3",
+    "parcel": "^2.16.4",
+    "typescript": "6.0.3"
+  }
+}

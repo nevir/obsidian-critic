@@ -1,0 +1,12 @@
+{
+  "linter": {
+    "rules": {
+      "security": {
+        // Disallow javascript: URLs in HTML.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noScriptUrl": "error"
+      }
+    }
+  }
+}

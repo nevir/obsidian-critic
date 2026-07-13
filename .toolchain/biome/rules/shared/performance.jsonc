@@ -1,0 +1,12 @@
+{
+  "linter": {
+    "rules": {
+      "performance": {
+        // Prevent the usage of synchronous scripts.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noSyncScripts": "off"
+      }
+    }
+  }
+}

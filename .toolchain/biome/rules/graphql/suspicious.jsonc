@@ -1,0 +1,20 @@
+{
+  "linter": {
+    "rules": {
+      "suspicious": {
+        // Ensure that fields are not duplicated in a selection set.
+        "noDuplicateFields": "error",
+
+        // Enforce unique operation names across a GraphQL document.
+        // Duplicate names make client lookup, generated artifacts, and error
+        // reporting refer to the wrong operation.
+        "noDuplicateGraphqlOperationName": "error",
+
+        // Require the @deprecated directive to specify a deletion date.
+        // A mandatory GraphQL removal date is an organizational policy that this
+        // generic template has not adopted.
+        "useDeprecatedDate": "off"
+      }
+    }
+  }
+}

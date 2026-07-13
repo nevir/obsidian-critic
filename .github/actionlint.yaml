@@ -1,0 +1,5 @@
+# GitHub supports queued concurrency, but actionlint 1.7.12 predates its schema.
+paths:
+  .github/workflows/release.yml:
+    ignore:
+      - 'unexpected key "queue" for "concurrency" section'

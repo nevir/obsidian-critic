@@ -1,0 +1,8 @@
+{
+  "extends": "./base.jsonc",
+  "compilerOptions": {
+    // Keep this template's source-root inference stable across upgrades.
+    "rootDir": "../../src"
+  },
+  "include": ["../../src/**/*.ts"]
+}

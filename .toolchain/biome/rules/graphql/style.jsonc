@@ -1,0 +1,38 @@
+{
+  "linter": {
+    "rules": {
+      "style": {
+        // Disallow the usage of specified root types.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "noRootType": "off",
+
+        // Require all descriptions to follow the same style (either block or
+        // inline) to maintain consistency and improve readability across the
+        // schema.
+        // This is a preference rather than a clear correctness requirement for a
+        // small Obsidian plugin; keep it explicit but off.
+        "useConsistentGraphqlDescriptions": "off",
+
+        // When deprecating something, explain why and what to use instead.
+        "useDeprecatedReason": "error",
+
+        // Validates that all enum values are capitalized.
+        // This is a preference rather than a clear correctness requirement for a
+        // small Obsidian plugin; keep it explicit but off.
+        "useGraphqlNamingConvention": "off",
+
+        // Require mutation argument to be always called "input".
+        // This is a preference rather than a clear correctness requirement for a
+        // small Obsidian plugin; keep it explicit but off.
+        "useInputName": "off",
+
+        // Require queries, mutations, subscriptions or fragments each to be located
+        // in separate files.
+        // This is a preference rather than a clear correctness requirement for a
+        // small Obsidian plugin; keep it explicit but off.
+        "useLoneExecutableDefinition": "off"
+      }
+    }
+  }
+}

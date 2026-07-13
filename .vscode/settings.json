@@ -1,0 +1,43 @@
+{
+  // Formatting
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+
+  // Editing
+  "editor.rulers": [80, 120],
+
+  // Workspace
+  "files.exclude": {
+    "**/.*": false,
+    "**/node_modules/": false,
+    "**/*.lock": false,
+    "*config.json": false,
+    "biome.json*": false,
+    "data.json": false,
+    "main.js": false,
+  },
+
+  // TypeScript
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single",
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // JSON
+  "json.schemas": [
+    {
+      "fileMatch": ["{,**/}biome.jsonc", ".toolchain/biome/**/*.jsonc"],
+      "url": "/node_modules/@biomejs/biome/configuration_schema.json",
+    },
+    {
+      "fileMatch": [".toolchain/typescript/**/*.jsonc"],
+      "url": "https://json.schemastore.org/tsconfig",
+    },
+  ],
+}

@@ -1,0 +1,37 @@
+// Biome does not support transitive extends, so this root shim lists every
+// reusable configuration leaf directly.
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    ".toolchain/biome/base.jsonc",
+    ".toolchain/biome/rules/css/a11y.jsonc",
+    ".toolchain/biome/rules/css/complexity.jsonc",
+    ".toolchain/biome/rules/css/correctness.jsonc",
+    ".toolchain/biome/rules/css/nursery.jsonc",
+    ".toolchain/biome/rules/css/style.jsonc",
+    ".toolchain/biome/rules/css/suspicious.jsonc",
+    ".toolchain/biome/rules/graphql/correctness.jsonc",
+    ".toolchain/biome/rules/graphql/nursery.jsonc",
+    ".toolchain/biome/rules/graphql/style.jsonc",
+    ".toolchain/biome/rules/graphql/suspicious.jsonc",
+    ".toolchain/biome/rules/html/correctness.jsonc",
+    ".toolchain/biome/rules/html/nursery.jsonc",
+    ".toolchain/biome/rules/html/performance.jsonc",
+    ".toolchain/biome/rules/html/style.jsonc",
+    ".toolchain/biome/rules/javascript/complexity.jsonc",
+    ".toolchain/biome/rules/javascript/correctness.jsonc",
+    ".toolchain/biome/rules/javascript/nursery.jsonc",
+    ".toolchain/biome/rules/javascript/performance.jsonc",
+    ".toolchain/biome/rules/javascript/security.jsonc",
+    ".toolchain/biome/rules/javascript/style.jsonc",
+    ".toolchain/biome/rules/javascript/suspicious.jsonc",
+    ".toolchain/biome/rules/json/nursery.jsonc",
+    ".toolchain/biome/rules/json/suspicious.jsonc",
+    ".toolchain/biome/rules/shared/a11y.jsonc",
+    ".toolchain/biome/rules/shared/nursery.jsonc",
+    ".toolchain/biome/rules/shared/performance.jsonc",
+    ".toolchain/biome/rules/shared/security.jsonc",
+    ".toolchain/biome/rules/shared/style.jsonc",
+    ".toolchain/biome/rules/shared/suspicious.jsonc"
+  ]
+}

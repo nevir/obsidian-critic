@@ -1,0 +1,29 @@
+{
+  "linter": {
+    "rules": {
+      "nursery": {
+        // Disallow duplicate selectors.
+        // Repeating a selector can conceal an accidental cascade override or
+        // split one component's declarations across the stylesheet.
+        "noDuplicateSelectors": "error",
+
+        // Limit the number of classes in a selector.
+        // The threshold is subjective and should follow real plugin size data
+        // rather than constrain a reusable starter.
+        "noExcessiveSelectorClasses": "off",
+
+        // Reports CSS class selectors that are never referenced in any JSX or HTML
+        // file.
+        // Obsidian loads the release `styles.css` separately, so cross-file class
+        // usage analysis would report false positives.
+        "noUnusedClasses": "off",
+
+        // Disallow CSS properties, values, at-rules, functions, and selectors that
+        // are not part of the configured Baseline.
+        // This rule needs a project-specific allowlist, denylist, or compatibility
+        // policy; an empty generic policy would be misleading.
+        "useBaseline": "off"
+      }
+    }
+  }
+}

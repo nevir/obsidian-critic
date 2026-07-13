@@ -1,0 +1,106 @@
+// https://biomejs.dev/reference/configuration/
+{
+  // https://biomejs.dev/reference/configuration/#files
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+
+  // https://biomejs.dev/reference/configuration/#formatter
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80
+  },
+
+  // https://biomejs.dev/assist/
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+
+  // https://biomejs.dev/reference/configuration/#javascript
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "single",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "asNeeded",
+      "bracketSameLine": false
+    }
+  },
+
+  // https://biomejs.dev/reference/configuration/#linter
+  "linter": {
+    "rules": {
+      // Every rule is configured explicitly in the language/category files.
+      "preset": "none"
+    }
+  },
+
+  // https://biomejs.dev/reference/configuration/#overrides
+  "overrides": [
+    {
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            // Node built-ins are unavailable when the plugin loads on mobile.
+            "noNodejsModules": "error"
+          }
+        }
+      }
+    },
+    {
+      "includes": [".vscode/**"],
+      "json": {
+        "parser": {
+          "allowComments": true,
+          "allowTrailingCommas": true
+        },
+        "formatter": {
+          "trailingCommas": "all"
+        }
+      }
+    },
+    {
+      "includes": ["**/*.json*"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            // TypeScript cannot catch duplicate keys in JSON files.
+            "noDuplicateObjectKeys": "error"
+          }
+        }
+      },
+      "assist": {
+        "actions": {
+          "source": {
+            // It is context-dependent whether JSON keys should be sorted.
+            "useSortedKeys": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.css"],
+      "assist": {
+        "actions": {
+          "source": {
+            // It is context-dependent whether CSS keys should be sorted.
+            "useSortedKeys": "off"
+          }
+        }
+      }
+    }
+  ]
+}

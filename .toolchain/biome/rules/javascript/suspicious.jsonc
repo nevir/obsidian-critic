@@ -1,0 +1,403 @@
+{
+  "linter": {
+    "rules": {
+      "suspicious": {
+        // Disallow the use of alert, confirm, and prompt.
+        // Blocking browser dialogs freeze Obsidian's renderer and bypass its UI
+        // conventions, so plugin code should use Obsidian notices or modals.
+        "noAlert": "error",
+
+        // If there's a standard constant of a value, use it.
+        "noApproximativeNumericConstant": "error",
+
+        // Sometimes we want elements that will always be in the same order.
+        "noArrayIndexKey": "off",
+
+        // Too fancy by half, and easily confused with an equality comparison.
+        "noAssignInExpressions": "error",
+
+        // You're going to get into trouble if you do it (like siltently eaten
+        // errors).
+        "noAsyncPromiseExecutor": "error",
+
+        // Disallow bitwise operators.
+        // Bitwise operations remain valid for flags, masks, hashes, and compact
+        // binary formats.
+        "noBitwiseOperators": "off",
+
+        // Reassigning a catch binding hides the original exception while its
+        // stack and context may still be needed.
+        "noCatchAssign": "error",
+
+        // Biome catches class reassignments hidden behind an any assertion,
+        // closing a deliberate escape hatch in TypeScript's check.
+        "noClassAssign": "error",
+
+        // Raw comment syntax inside JSX becomes visible text; comments must use
+        // the JSX expression form instead.
+        "noCommentText": "error",
+
+        // Let's avoid the use of negative zero.
+        "noCompareNegZero": "error",
+
+        // Goto statements are harmful. We learned this decades ago.
+        "noConfusingLabels": "error",
+
+        // You probably mean `undefined` or `never`.
+        "noConfusingVoidType": "error",
+
+        // Obsidian's developer console is useful while building plugins, so
+        // this template does not ban console calls globally.
+        "noConsole": "off",
+
+        // Disallow expressions where the operation doesn't affect the value.
+        // A binary expression with a constant result usually exposes a typo or
+        // an unreachable branch in plugin logic.
+        "noConstantBinaryExpressions": "error",
+
+        // While the inlining of const enums is nice, it also adds to the
+        // complexity of our build setup (type information of imports becomes
+        // required when parsing a file).
+        "noConstEnum": "error",
+
+        // Likely indicates an input error.
+        "noControlCharactersInRegex": "error",
+
+        // Don't leave those debugger statements lying around!
+        "noDebugger": "error",
+
+        // Restrict imports of deprecated exports.
+        // Depending on deprecated Obsidian or library exports makes upgrades
+        // brittle, so new uses must be addressed immediately.
+        "noDeprecatedImports": "error",
+
+        // Disallow direct assignments to document.cookie.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDocumentCookie": "error",
+
+        // Prevents importing next/document outside of pages/_document.jsx in
+        // Next.js projects.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "noDocumentImportInPage": "off",
+
+        // Coercive equality makes comparisons harder to predict; require strict
+        // equality unless an exception is explicitly suppressed.
+        "noDoubleEquals": "error",
+
+        // Likely indicates an incomplete refactor.
+        "noDuplicateCase": "error",
+
+        // Already handled by TypeScript.
+        "noDuplicateClassMembers": "off",
+
+        // Disallow JSX prop spreading the same identifier multiple times.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noDuplicatedSpreadProps": "off",
+
+        // Disallow duplicate conditions in if-else-if chains.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateElseIf": "error",
+
+        // Disallow duplicate enum member values.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noDuplicateEnumValues": "error",
+
+        // Already handled by TypeScript.
+        "noDuplicateJsxProps": "off",
+
+        // Already handled by TypeScript.
+        "noDuplicateParameters": "off",
+
+        // Only one instance of each lifecycle hook per test context.
+        "noDuplicateTestHooks": "error",
+
+        // Can be helpful to have empty functions.
+        "noEmptyBlockStatements": "off",
+
+        // Can be helpful as placeholders / documentation.
+        "noEmptyInterface": "off",
+
+        // Require the use of === or !== for comparison with null.
+        // Strict comparison makes the intended distinction between null and
+        // undefined explicit instead of relying on coercion.
+        "noEqualsToNull": "error",
+
+        // Biome recommends leaving this off when TypeScript's noImplicitAny is
+        // enabled, avoiding overlapping diagnostics for evolving any types.
+        "noEvolvingTypes": "off",
+
+        // Sometimes we legitimately need to use `any` (though please prefer
+        // `unknown` where possible).
+        "noExplicitAny": "off",
+
+        // Files containing tests should expect to be run directly, and not used
+        // as a module.
+        "noExportsInTest": "error",
+
+        // I know it's exciting, but let's not get carried away.
+        "noExtraNonNullAssertion": "error",
+
+        // Biome is the single error-level owner for switch fallthrough, so the
+        // overlapping TypeScript option stays disabled.
+        "noFallthroughSwitchClause": "error",
+
+        // Make sure all tests are active in main.
+        "noFocusedTests": "error",
+
+        // Disallow iterating using a for-in loop.
+        // for-in also visits inherited enumerable properties; keys, values, or
+        // entries make object iteration safe and intentional.
+        "noForIn": "error",
+
+        // Biome catches function reassignments hidden behind an any assertion,
+        // which TypeScript intentionally permits.
+        "noFunctionAssign": "error",
+
+        // Reassigning host globals can destabilize every plugin in Obsidian,
+        // and TypeScript permits assignments when the types happen to match.
+        "noGlobalAssign": "error",
+
+        // Use Number.isFinite(); it doesn't perform implicit coercion.
+        "noGlobalIsFinite": "error",
+
+        // Use Number.isNaN(); it doesn't perform implicit coercion.
+        "noGlobalIsNan": "error",
+
+        // Prevent using the next/head module in pages/_document.js on Next.js
+        // projects.
+        // The template does not use the next domain; enable this when that
+        // framework or tool is deliberately added.
+        "noHeadImportInDocument": "off",
+
+        // A case that TypeScript's noImplicitAny doesn't cover.
+        "noImplicitAnyLet": "error",
+
+        // Biome catches writes to imports hidden behind an any assertion, which
+        // would otherwise mutate a supposedly read-only binding.
+        "noImportAssign": "error",
+
+        // Prevent import cycles.
+        // Cycles can expose partially initialized modules during plugin startup
+        // and make load order difficult to reason about.
+        "noImportCycles": "error",
+
+        // Really, you shouldn't be using labels at all. But if you are…
+        "noLabelVar": "error",
+
+        // Prevent problematic leaked values from being rendered.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noLeakedRender": "off",
+
+        // composite characters break RegExp character classes.
+        "noMisleadingCharacterClass": "error",
+
+        // Only allow new() on interfaces, not classes.
+        "noMisleadingInstantiator": "error",
+
+        // Too fiddly to get right for all cases.
+        "noMisplacedAssertion": "off",
+
+        // Likely indicates an incomplete refactor.
+        "noMisrefactoredShorthandAssign": "error",
+
+        // Disallow nested .then() or .catch() promise calls.
+        // Nested promise chains obscure return and error propagation; a flat
+        // chain or async function keeps plugin lifecycle failures visible.
+        "noNestedPromises": "error",
+
+        // Disallow non-null assertions after optional chaining expressions.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noNonNullAssertedOptionalChain": "error",
+
+        // Disallow octal escape sequences in string literals.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noOctalEscape": "error",
+
+        // Disallow function parameters that are only used in recursive calls.
+        // Recursive algorithms can legitimately pass state only to the next
+        // recursive call.
+        "noParametersOnlyUsedInRecursion": "off",
+
+        // Disallow the use of the deprecated __proto__ object property.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noProto": "error",
+
+        // You'll get into trouble for things that don't extend Object.
+        "noPrototypeBuiltins": "error",
+
+        // Replaces usages of forwardRef with passing ref as a prop.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noReactForwardRef": "off",
+
+        // This rule's diagnostics belong to Solid and Qwik domains, neither of
+        // which is used by a plain Obsidian TypeScript plugin.
+        "noReactSpecificProps": "off",
+
+        // TypeScript catches lexical, type, and function redeclarations; noVar
+        // removes the duplicate-var case it permits.
+        "noRedeclare": "off",
+
+        // Modules are already strict and Parcel owns emitted wrappers, so a
+        // manual use-strict directive is redundant noise.
+        "noRedundantUseStrict": "error",
+
+        // Disallow assignments in return statements.
+        // Combining mutation with return is easy to mistake for a comparison
+        // and hides a side effect from callers.
+        "noReturnAssign": "error",
+
+        // Likely indicates an incomplete refactor.
+        "noSelfCompare": "error",
+
+        // Disallow variable declarations from shadowing variables declared in the
+        // outer scope.
+        // Shadowing makes it unclear which plugin, settings, or service instance
+        // a callback closes over.
+        "noShadow": "error",
+
+        // Let's not get confused by shadowing globals.
+        "noShadowRestrictedNames": "error",
+
+        // Make sure all tests are active in main.
+        "noSkippedTests": "error",
+
+        // If you really want to use a sparse array, initialize it explicitly.
+        "noSparseArray": "error",
+
+        // A stray semicolon in JSX becomes a visible text node rather than
+        // statement punctuation.
+        "noSuspiciousSemicolonInJsx": "error",
+
+        // Disallow template literal placeholder syntax in regular strings.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noTemplateCurlyInString": "error",
+
+        // Making an object appear thenable can get you into trouble.
+        "noThenProperty": "error",
+
+        // Prevents the use of the TypeScript directive @ts-ignore.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noTsIgnore": "error",
+
+        // Disallow let or var variables that are read but never assigned.
+        // Reading a never-assigned binding usually means initialization was
+        // omitted and would otherwise leak undefined into runtime behavior.
+        "noUnassignedVariables": "error",
+
+        // Disallow the use of undeclared environment variables.
+        // The template does not use the turborepo domain; enable this when that
+        // framework or tool is deliberately added.
+        "noUndeclaredEnvVars": "off",
+
+        // Disallow unknown DOM properties.
+        // The template does not use the react domain; enable this when that
+        // framework or tool is deliberately added.
+        "noUnknownAttribute": "off",
+
+        // Disallow conditions that always evaluate to the same value.
+        // A constant condition signals unreachable code or incorrect type
+        // narrowing and should be fixed before shipping the plugin.
+        "noUnnecessaryConditions": "error",
+
+        // There are some fancy cases where this is helpful for API ergonomics.
+        "noUnsafeDeclarationMerging": "off",
+
+        // Catch cases where we're negating the wrong thing.
+        "noUnsafeNegation": "error",
+
+        // Disallow expression statements that are neither a function call nor an
+        // assignment.
+        // A standalone value has no effect and commonly means a call, return, or
+        // assignment was accidentally omitted.
+        "noUnusedExpressions": "error",
+
+        // Disallow useless backreferences in regular expression literals that
+        // always match an empty string.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noUselessRegexBackrefs": "error",
+
+        // Use let or const.
+        "noVar": "error",
+
+        // Disallows using arrow functions when defining a watcher.
+        // The template does not use the vue domain; enable this when that framework
+        // or tool is deliberately added.
+        "noVueArrowFuncInWatch": "off",
+
+        // We are always working in strict mode, which gives a better error.
+        "noWith": "off",
+
+        // Disallow the use of overload signatures that are not next to each other.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useAdjacentOverloadSignatures": "error",
+
+        // Require Array#sort and Array#toSorted calls to always provide a
+        // compareFunction.
+        // JavaScript's default sort is lexicographic; an explicit comparator
+        // prevents surprising ordering for numbers and structured values.
+        "useArraySortCompare": "error",
+
+        // Make sure that each function is in the Promise's stack.
+        "useAwait": "error",
+
+        // Enforce that default is the last case in a switch statement.
+        "useDefaultSwitchClauseLast": "error",
+
+        // In some cases we want to construct messages in other ways.
+        "useErrorMessage": "off",
+
+        // Already handled by TypeScript.
+        "useGetterReturn": "off",
+
+        // Enforces the use of a recommended display strategy with Google Fonts.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useGoogleFontDisplay": "error",
+
+        // Require for-in loops to include an if statement.
+        // When for-in is unavoidable, an own-property guard prevents inherited
+        // keys from entering plugin state.
+        "useGuardForIn": "error",
+
+        // Not every array-like thing inherits Array.
+        "useIsArray": "error",
+
+        // Enforce consistent return values in iterable callbacks.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "useIterableCallbackReturn": "error",
+
+        // module is deprecated in favor of namespace.
+        "useNamespaceKeyword": "error",
+
+        // Be explicit about the number of digits you want.
+        "useNumberToFixedDigitsArgument": "error",
+
+        // Use static Response methods instead of new Response() constructor when
+        // possible.
+        // Static factories communicate standard response intent and avoid
+        // manually recreating redirect, error, or JSON response semantics.
+        "useStaticResponseMethods": "error",
+
+        // Enforce the use of the directive "use strict" in script files.
+        // TypeScript modules are already strict; requiring a redundant directive
+        // would add generated-looking noise.
+        "useStrictMode": "off"
+      }
+    }
+  }
+}

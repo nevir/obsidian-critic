@@ -1,0 +1,139 @@
+{
+  "linter": {
+    "rules": {
+      "a11y": {
+        // The accesskey attribute is inconsistently implemented across
+        // browsers, and tends to more harm than good by conflicting with
+        // screen readers.
+        //
+        // https://webaim.org/techniques/keyboard/accesskey#poor
+        "noAccessKey": "error",
+
+        // Disallow ambiguous anchor descriptions.
+        // Biome recommends this check; treating it as an error preserves the
+        // template’s strict, upgrade-explicit quality gate.
+        "noAmbiguousAnchorText": "error",
+
+        // If an element is focusable, we shouldn't be hiding it.
+        "noAriaHiddenOnFocusable": "error",
+
+        // Can confuse screen readers.
+        "noAriaUnsupportedElements": "error",
+
+        // While this can be problematic for screen readers, it is also
+        // something that we find useful in certain scenarios.
+        "noAutofocus": "off",
+
+        // Blinking and marquee content is distracting and can create an
+        // accessibility barrier, so plugins should never emit those elements.
+        "noDistractingElements": "error",
+
+        // Avoid misuse of the scope attribute.
+        "noHeaderScope": "error",
+
+        // Recasting an interactive control as non-interactive hides its actual
+        // behavior from assistive technology.
+        "noInteractiveElementToNoninteractiveRole": "error",
+
+        // Enforce that we associate labels with their controls.
+        "noLabelWithoutControl": "error",
+
+        // Disallow event handlers on non-interactive elements.
+        // Plugin code runs inside a user’s vault and renders user-facing UI, so
+        // this low-noise safety check should fail CI.
+        "noNoninteractiveElementInteractions": "error",
+
+        // We should be using the correct element for the job.
+        //
+        // Though, this rule may prove to be too restrictive?
+        "noNoninteractiveElementToInteractiveRole": "error",
+
+        // Screen readers can navigate non-interactive things just fine; you
+        // don't need to assist 'em.
+        "noNoninteractiveTabindex": "error",
+
+        // Deviating from the content order gets really confusing really fast
+        // for screen reader users.
+        "noPositiveTabindex": "error",
+
+        // If you're going to specify alt text, make sure it's meaningful.
+        "noRedundantAlt": "error",
+
+        // Avoid re-stating an element's default role.
+        "noRedundantRoles": "error",
+
+        // Make sure that a role is set along with onClick.
+        "noStaticElementInteractions": "error",
+
+        // Enforce that svg elements have alt text (a <title> or aria-label).
+        "noSvgWithoutTitle": "error",
+
+        // Make sure that we're describing images appropriately.
+        "useAltText": "error",
+
+        // Make sure that all links have discernible text.
+        "useAnchorContent": "error",
+
+        // Descendant elements (e.g. select box options) must be tabbable.
+        "useAriaActivedescendantWithTabindex": "error",
+
+        // Ensure that all required ARIA properties are set for the element's
+        // role.
+        "useAriaPropsForRole": "error",
+
+        // Ensure that extraneous ARIA properties are not set for the element's
+        // role.
+        "useAriaPropsSupportedByRole": "error",
+
+        // The default button type is 'submit'; that's rarely what you want.
+        "useButtonType": "error",
+
+        // All interactive elements must be focusable.
+        "useFocusableInteractive": "error",
+
+        // Make sure all headers have discernible text.
+        "useHeadingContent": "error",
+
+        // Let's be explicit about our content language.
+        "useHtmlLang": "error",
+
+        // Make sure that we're describing iframes appropriately.
+        "useIframeTitle": "error",
+
+        // If you're going to make an element clickable, you'd better also make
+        // it navigable via the keyboard, too. Not everyone can use a mouse.
+        "useKeyWithClickEvents": "error",
+
+        // If you're going to make an element respond to hover events, you'd
+        // better also make it support similar behavior via focus events. Not
+        // everyone can use a mouse.
+        "useKeyWithMouseEvents": "error",
+
+        // Enforce that we've also got accessible media.
+        "useMediaCaption": "error",
+
+        // Prefer semantic elements over the role attribute.
+        "useSemanticElements": "error",
+
+        // Let's not hijack standard link behaviors.
+        "useValidAnchor": "error",
+
+        // Make sure that we're using each aria attribute appropriately.
+        "useValidAriaProps": "error",
+
+        // Make sure that we're using each aria role appropriately.
+        "useValidAriaRole": "error",
+
+        // Make sure that we're using the value of each ARIA attribute
+        // appropriately.
+        "useValidAriaValues": "error",
+
+        // Validates the `autocomplete` attribute on input elements.
+        "useValidAutocomplete": "error",
+
+        // Sorry, no fictitious languages or countries here.
+        "useValidLang": "error"
+      }
+    }
+  }
+}
