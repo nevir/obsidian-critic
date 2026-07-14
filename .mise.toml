@@ -24,7 +24,7 @@ outputs = ["node_modules/.yarn-state.yml"]
 description = "Build the production Obsidian plugin bundle"
 depends = ["install"]
 run = [
-  "yarn exec parcel build --no-source-maps",
+  "yarn exec parcel build --no-cache --no-source-maps",
   "node .toolchain/check-bundle.mjs",
 ]
 
