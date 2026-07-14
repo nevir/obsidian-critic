@@ -8,8 +8,10 @@ import {
   TFile,
 } from 'obsidian';
 
-import type { ReviewProjection } from '../../core/projection';
-import { prepareReadingDocument } from './document-projection';
+import {
+  projectCriticMarkup,
+  type ReviewProjection,
+} from '../../core/projection';
 
 const OWNED_BLOCK_SELECTOR = '[data-critic-reading-owned]';
 const PROJECTION_SELECTOR = '[data-critic-reading-projection]';
@@ -23,13 +25,15 @@ interface DocumentRender {
   readonly wrapper: HTMLElement;
 }
 
-const documentRenders = new WeakMap<HTMLElement, DocumentRender>();
-let nextRenderToken = 0;
+type DocumentRenders = WeakMap<HTMLElement, DocumentRender>;
 
 export function createReadingPostProcessor(
   app: App,
   getProjection: () => ReviewProjection,
 ): MarkdownPostProcessor {
+  const documentRenders: DocumentRenders = new WeakMap();
+  let nextRenderToken = 0;
+
   return async (element, context) => {
     if (element.closest(PROJECTION_SELECTOR) !== null) return;
     const previewSection = element.closest<HTMLElement>(
@@ -41,22 +45,20 @@ export function createReadingPostProcessor(
     if (file === null) return;
     const source = await app.vault.cachedRead(file);
 
-    const existing = documentRenders.get(previewSection);
     const projection = getProjection();
-    const prepared = prepareReadingDocument(source, projection);
+    const projected = projectCriticMarkup(source, projection);
+    const existing = attachedRender(
+      previewSection,
+      documentRenders.get(previewSection),
+    );
     const ownsDocument =
-      (existing?.host.parentElement === previewSection &&
-        existing.wrapper.parentElement === existing.host) ||
+      existing !== null ||
       previewSection.querySelector(`:scope > ${OWNED_BLOCK_SELECTOR}`) !== null;
-    if (prepared === null && !ownsDocument) return;
-    const renderDocument = prepared ?? { markdown: source, projected: source };
+    if (projected === source && !ownsDocument) return;
 
     if (
-      existing?.host.parentElement === previewSection &&
-      existing.wrapper.parentElement === existing.host &&
-      existing.projection === projection &&
-      existing.source === source &&
-      existing.sourcePath === file.path
+      existing !== null &&
+      renderMatches(existing, projection, source, file.path)
     ) {
       claimLateNativeBlocks(previewSection, context, existing.token);
       return;
@@ -73,31 +75,26 @@ export function createReadingPostProcessor(
     wrapper.className = 'critic-reading-section';
     wrapper.dataset['criticReadingProjection'] = token;
     host.append(wrapper);
-    documentRenders.set(previewSection, {
+    const render: DocumentRender = {
       projection,
       source,
       sourcePath: file.path,
       token,
       host,
       wrapper,
-    });
+    };
+    documentRenders.set(previewSection, render);
 
     const child = new MarkdownRenderChild(wrapper);
     context.addChild(child);
     try {
-      await MarkdownRenderer.render(
-        app,
-        renderDocument.markdown,
-        wrapper,
-        file.path,
-        child,
-      );
-      if (!renderIsCurrent(previewSection, token, wrapper)) return;
-      if (prepared !== null) disableProjectedTasks(wrapper);
+      await MarkdownRenderer.render(app, projected, wrapper, file.path, child);
+      if (!renderIsCurrent(documentRenders, previewSection, render)) return;
+      if (projected !== source) disableProjectedTasks(wrapper);
     } catch {
-      if (!renderIsCurrent(previewSection, token, wrapper)) return;
+      if (!renderIsCurrent(documentRenders, previewSection, render)) return;
       wrapper.classList.add('critic-reading-error');
-      wrapper.textContent = renderDocument.projected;
+      wrapper.textContent = projected;
     }
   };
 }
@@ -169,11 +166,35 @@ function sourceBlocks(
   );
 }
 
+function attachedRender(
+  previewSection: HTMLElement,
+  render: DocumentRender | undefined,
+): DocumentRender | null {
+  return render !== undefined && renderIsAttached(previewSection, render)
+    ? render
+    : null;
+}
+
+function renderMatches(
+  render: DocumentRender,
+  projection: ReviewProjection,
+  source: string,
+  sourcePath: string,
+): boolean {
+  return (
+    render.projection === projection &&
+    render.source === source &&
+    render.sourcePath === sourcePath
+  );
+}
+
 function claimDocumentBlocks(
   blocks: readonly HTMLElement[],
   host: HTMLElement,
   token: string,
 ): void {
+  // Section callbacks expose document-scoped source, so Critic renders one
+  // projected document while retaining Obsidian's lifecycle-owned block roots.
   for (const block of blocks) {
     block.replaceChildren();
     block.dataset['criticReadingOwned'] = token;
@@ -187,15 +208,22 @@ function claimDocumentBlocks(
 }
 
 function renderIsCurrent(
+  documentRenders: DocumentRenders,
   previewSection: HTMLElement,
-  token: string,
-  wrapper: HTMLElement,
+  render: DocumentRender,
 ): boolean {
-  const current = documentRenders.get(previewSection);
   return (
-    current?.token === token &&
-    current.wrapper === wrapper &&
-    current.host.parentElement === previewSection &&
-    wrapper.parentElement === current.host
+    documentRenders.get(previewSection) === render &&
+    renderIsAttached(previewSection, render)
+  );
+}
+
+function renderIsAttached(
+  previewSection: HTMLElement,
+  render: DocumentRender,
+): boolean {
+  return (
+    render.host.parentElement === previewSection &&
+    render.wrapper.parentElement === render.host
   );
 }

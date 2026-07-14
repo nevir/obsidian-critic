@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   DEFAULT_CRITIC_SETTINGS,
   normalizeCriticSettings,
+  settingsErrorMessage,
 } from '../../src/obsidian/settings.ts';
 
 test('defaults missing and invalid saved settings to Original', () => {
@@ -31,4 +32,15 @@ test('accepts only the persisted Proposed value', () => {
 
 test('returns a fresh settings value', () => {
   assert.notEqual(normalizeCriticSettings(null), DEFAULT_CRITIC_SETTINGS);
+});
+
+test('formats settings failures without assuming an Error value', () => {
+  assert.equal(
+    settingsErrorMessage(new Error('disk full')),
+    'Critic could not save its Reading View setting: disk full',
+  );
+  assert.equal(
+    settingsErrorMessage('unknown'),
+    'Critic could not save its Reading View setting',
+  );
 });

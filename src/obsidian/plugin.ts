@@ -9,8 +9,10 @@ import {
   DEFAULT_CRITIC_SETTINGS,
   normalizeCriticSettings,
 } from './settings';
+import { showSettingsError } from './settings-notice';
 import { CriticSettingsTab } from './settings-tab';
 
+// Obsidian reserves MAX_SAFE_INTEGER itself as a non-runnable terminal order.
 const FINAL_RUNNABLE_POSTPROCESSOR_ORDER = Number.MAX_SAFE_INTEGER - 1;
 
 export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
@@ -67,6 +69,8 @@ export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
     const revision = this.settingsRevision;
     this.settings = next;
 
+    // Preserve user order across rapid changes. Only the newest revision may
+    // rerender on success or roll optimistic in-memory state back on failure.
     const save = this.settingsSaveQueue.then(() => this.saveData(next));
     this.settingsSaveQueue = save.catch(() => undefined);
     return save
@@ -89,15 +93,6 @@ export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
       }
     });
   }
-}
-
-function settingsError(error: unknown): string {
-  const detail = error instanceof Error ? `: ${error.message}` : '';
-  return `Critic could not save its Reading View setting${detail}`;
-}
-
-function showSettingsError(error: unknown): obsidian.Notice {
-  return new obsidian.Notice(settingsError(error));
 }
 
 function showProjectionChanged(projection: ReviewProjection): obsidian.Notice {

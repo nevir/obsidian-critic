@@ -2,6 +2,7 @@ import * as obsidian from 'obsidian';
 
 import type { ReviewProjection } from '../core/projection';
 import type { CriticSettings } from './settings';
+import { showSettingsError } from './settings-notice';
 
 export interface CriticSettingsController {
   readonly settings: CriticSettings;
@@ -44,13 +45,4 @@ export class CriticSettingsTab extends obsidian.PluginSettingTab {
 
 function readingProjection(value: string): ReviewProjection {
   return value === 'proposed' ? 'proposed' : 'original';
-}
-
-function settingsError(error: unknown): string {
-  const detail = error instanceof Error ? `: ${error.message}` : '';
-  return `Critic could not save its Reading View setting${detail}`;
-}
-
-function showSettingsError(error: unknown): obsidian.Notice {
-  return new obsidian.Notice(settingsError(error));
 }
