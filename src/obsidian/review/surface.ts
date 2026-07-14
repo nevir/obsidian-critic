@@ -24,10 +24,11 @@ import type { ReviewPresentation } from './presentation';
 import { ReviewRail } from './rail';
 import { ReviewSheet } from './sheet';
 import {
-  chooseSurfaceMode,
+  chooseVisibleSurfaceMode,
   normalizeWheelDelta,
   type ReviewSurfaceMode,
   sheetDocumentDelta,
+  type VisibleReviewSurfaceMode,
 } from './surface-policy';
 
 type SurfaceMeasurement =
@@ -55,7 +56,7 @@ export class ReviewSurfaceController {
     reviewing: boolean;
     destroyed: boolean;
   } = { reviewing: false, destroyed: false };
-  private mode: ReviewSurfaceMode = 'hidden';
+  private mode: VisibleReviewSurfaceMode = 'sheet';
   private scrollState: ReviewScrollState = createScrollState();
   private snapshot: ExpandedSnapshot | null = null;
   private previousScrollTop: number;
@@ -70,7 +71,7 @@ export class ReviewSurfaceController {
     this.rail = new ReviewRail(view.dom, app, callbacks, this.schedule);
     this.sheet = new ReviewSheet(view.dom, app, callbacks, this.schedule);
     this.previousScrollTop = view.scrollDOM.scrollTop;
-    this.editorResizeObserver = new ResizeObserver(this.schedule);
+    this.editorResizeObserver = new ResizeObserver(this.handleEditorResize);
     this.editorResizeObserver.observe(view.dom);
     view.scrollDOM.addEventListener('scroll', this.handleDocumentScroll, {
       passive: true,
@@ -78,6 +79,10 @@ export class ReviewSurfaceController {
     this.rail.element.addEventListener('wheel', this.handleRailWheel, {
       passive: false,
     });
+  }
+
+  get presentationMode(): VisibleReviewSurfaceMode {
+    return this.mode;
   }
 
   reconcile(
@@ -142,14 +147,12 @@ export class ReviewSurfaceController {
     this.rail.element.removeEventListener('wheel', this.handleRailWheel);
     this.rail.destroy();
     this.sheet.destroy();
-    setEditorMode(this.view, 'hidden');
   }
 
   private readMeasurement(): SurfaceMeasurement {
-    const mode = chooseSurfaceMode(
-      this.view.dom.clientWidth,
-      this.lifecycle.reviewing,
-    );
+    const mode: ReviewSurfaceMode = this.lifecycle.reviewing
+      ? this.mode
+      : 'hidden';
     if (mode === 'hidden') return { mode };
     const documentDelta = this.pendingDocumentDelta;
     if (mode === 'sheet') {
@@ -178,13 +181,6 @@ export class ReviewSurfaceController {
     }
     if ('collisionDelta' in measurement) {
       this.pendingCollisionDelta -= measurement.collisionDelta;
-    }
-    if (measurement.mode !== this.mode) {
-      this.mode = measurement.mode;
-      this.snapshot = null;
-      setEditorMode(this.view, this.mode);
-      this.schedule();
-      return;
     }
     if (measurement.mode === 'hidden') {
       this.snapshot = null;
@@ -233,6 +229,23 @@ export class ReviewSurfaceController {
     this.schedule();
   };
 
+  private readonly handleEditorResize = (
+    entries: readonly ResizeObserverEntry[],
+  ): void => {
+    const entry = entries[entries.length - 1];
+    if (entry === undefined || this.lifecycle.destroyed) return;
+    const mode = chooseVisibleSurfaceMode(entry.contentRect.width);
+    if (mode === this.mode) {
+      this.schedule();
+      return;
+    }
+    this.mode = mode;
+    this.snapshot = null;
+    // Re-evaluate the ViewPlugin-provided root attributes without changing state.
+    this.view.update([]);
+    this.schedule();
+  };
+
   private readonly handleRailWheel = (event: WheelEvent): void => {
     if (this.mode !== 'expanded' || this.snapshot === null) return;
     const delta = normalizeWheelDelta(
@@ -273,9 +286,4 @@ export class ReviewSurfaceController {
       this.reviews.find(review => review.id === this.focusedReviewId) ?? null
     );
   }
-}
-
-function setEditorMode(view: EditorView, mode: ReviewSurfaceMode): void {
-  view.dom.classList.toggle('critic-expanded', mode === 'expanded');
-  view.dom.classList.toggle('critic-sheet-mode', mode === 'sheet');
 }

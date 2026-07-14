@@ -23,6 +23,7 @@ import {
 import { ReviewSurfaceController } from '../review/surface';
 import type { CriticEditorHost } from './host';
 import { criticEditorStateField } from './live-preview-state';
+import { criticEditorRootAttributes } from './root-attributes';
 
 export class CriticEditorSession implements PluginValue {
   private parsed: ParsedDocument;
@@ -37,7 +38,6 @@ export class CriticEditorSession implements PluginValue {
     const snapshot = view.state.field(criticEditorStateField);
     this.parsed = snapshot.parsed;
     this.livePreview = snapshot.livePreview;
-    this.syncEditorClass();
     this.surface = new ReviewSurfaceController(view, host.app, {
       focus: reviewId => this.focusReview(reviewId),
       clearFocus: () => this.clearFocus(),
@@ -57,6 +57,13 @@ export class CriticEditorSession implements PluginValue {
 
   get reviews(): readonly ReviewItem[] {
     return this.parsed.reviews;
+  }
+
+  get rootAttributes(): { readonly class: string } | null {
+    return criticEditorRootAttributes(
+      this.livePreview && this.parsed.reviews.length > 0,
+      this.surface.presentationMode,
+    );
   }
 
   update(update: ViewUpdate): void {
@@ -87,7 +94,6 @@ export class CriticEditorSession implements PluginValue {
       this.surface.schedule();
     }
     if (update.docChanged || update.viewportChanged || modeChanged) {
-      this.syncEditorClass();
       this.syncFocusClasses();
     }
   }
@@ -100,12 +106,6 @@ export class CriticEditorSession implements PluginValue {
   destroy(): void {
     this.surface.destroy();
     this.host.detachSession(this);
-    this.view.dom.classList.remove(
-      'critic-editor',
-      'critic-live-preview',
-      'critic-expanded',
-      'critic-sheet-mode',
-    );
   }
 
   focusReview(reviewId: string, scrollIntoView = true): boolean {
@@ -183,12 +183,6 @@ export class CriticEditorSession implements PluginValue {
 
   private reviewIds(): string[] {
     return this.parsed.reviews.map(review => review.id);
-  }
-
-  private syncEditorClass(): void {
-    const hasReviews = this.livePreview && this.parsed.reviews.length > 0;
-    this.view.dom.classList.toggle('critic-editor', hasReviews);
-    this.view.dom.classList.toggle('critic-live-preview', hasReviews);
   }
 
   private syncSurface(): void {

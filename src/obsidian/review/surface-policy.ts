@@ -1,15 +1,14 @@
-export type ReviewSurfaceMode = 'expanded' | 'hidden' | 'sheet';
+export type VisibleReviewSurfaceMode = 'expanded' | 'sheet';
+export type ReviewSurfaceMode = VisibleReviewSurfaceMode | 'hidden';
 
 export interface VisibleRect {
   readonly top: number;
   readonly bottom: number;
 }
 
-export function chooseSurfaceMode(
+export function chooseVisibleSurfaceMode(
   editorWidth: number,
-  reviewing: boolean,
-): ReviewSurfaceMode {
-  if (!reviewing) return 'hidden';
+): VisibleReviewSurfaceMode {
   return editorWidth >= 900 ? 'expanded' : 'sheet';
 }
 

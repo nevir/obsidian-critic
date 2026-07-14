@@ -2,15 +2,14 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  chooseSurfaceMode,
+  chooseVisibleSurfaceMode,
   normalizeWheelDelta,
   sheetDocumentDelta,
 } from '../../src/obsidian/review/surface-policy.ts';
 
 test('chooses one responsive surface from stable editor width', () => {
-  assert.equal(chooseSurfaceMode(1400, false), 'hidden');
-  assert.equal(chooseSurfaceMode(899, true), 'sheet');
-  assert.equal(chooseSurfaceMode(900, true), 'expanded');
+  assert.equal(chooseVisibleSurfaceMode(899), 'sheet');
+  assert.equal(chooseVisibleSurfaceMode(900), 'expanded');
 });
 
 test('normalizes pixel, line, and page wheel deltas', () => {
