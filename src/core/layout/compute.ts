@@ -1,8 +1,4 @@
-import {
-  choosePivotIndex,
-  chooseTruthfulPivotIndex,
-  correctAnchorInPlace,
-} from './driver';
+import { choosePivotIndex, correctAnchorInPlace } from './driver';
 import { focusedCardTargetTop, pinItemTopInPlace } from './focus';
 import {
   buildCollisionGroups,
@@ -16,19 +12,23 @@ import type {
   ExpandedLayout,
   ExpandedSnapshot,
   LayoutGeometry,
+  LayoutItem,
   LayoutMeasurement,
-  MutableLayoutItem,
   ReviewScrollState,
+  WorkingLayoutItem,
 } from './types';
 
 interface ComputeLayoutOptions extends LayoutGeometry {
   readonly focusedReviewId: string | null;
-  readonly sharedAnchorId: string | null;
-  readonly layoutAnchorId: string | null;
+  readonly previousDriverId: string | null;
   readonly scrollDirection: number;
   readonly scrollMoved: boolean;
   readonly collisionProgressOffsets: ReadonlyMap<string, number>;
   readonly tallThreadOffsets: ReadonlyMap<string, number>;
+}
+
+interface ComputedLayout extends ExpandedLayout {
+  readonly absorbedCollisionKeys: readonly string[];
 }
 
 export function computeExpandedSnapshot(
@@ -37,11 +37,10 @@ export function computeExpandedSnapshot(
   state: ReviewScrollState,
   options: ComputeSnapshotOptions = {},
 ): ExpandedSnapshot {
-  const layout = computeExpandedLayout(measurements, {
+  const computed = computeExpandedLayout(measurements, {
     ...geometry,
     focusedReviewId: state.focusedReviewId,
-    sharedAnchorId: state.visibleAnchorId,
-    layoutAnchorId: state.driverId,
+    previousDriverId: state.driverId,
     scrollDirection: state.scrollDirection,
     scrollMoved: options.scrollMoved ?? false,
     collisionProgressOffsets: state.collisionProgressOffsets,
@@ -50,15 +49,18 @@ export function computeExpandedSnapshot(
   const collisionProgressOffsets = cloneOffsetMap(
     state.collisionProgressOffsets,
   );
-  for (const key of layout.absorbedCollisionKeys) {
+  for (const key of computed.absorbedCollisionKeys) {
     collisionProgressOffsets.delete(key);
   }
+  const layout: ExpandedLayout = {
+    items: computed.items,
+    pivotIndex: computed.pivotIndex,
+  };
   return {
     layout,
     state: {
       ...state,
-      driverId: layout.layoutAnchorId,
-      visibleAnchorId: layout.sharedAnchorId,
+      driverId: layout.items[layout.pivotIndex]?.id ?? null,
       collisionProgressOffsets,
     },
   };
@@ -67,8 +69,11 @@ export function computeExpandedSnapshot(
 function computeExpandedLayout(
   measurements: readonly LayoutMeasurement[],
   options: ComputeLayoutOptions,
-): ExpandedLayout {
-  const items = measurements.map<MutableLayoutItem>(measurement => ({
+): ComputedLayout {
+  // The solver moves through automatic targets, non-overlap projection,
+  // explicit focus pinning, continuity correction, and document-edge release.
+  // Working values stay private; callers receive only committed geometry.
+  const items = measurements.map<WorkingLayoutItem>(measurement => ({
     ...measurement,
     anchorRect: { ...measurement.anchorRect },
     desiredTop: measurement.naturalTop,
@@ -92,13 +97,12 @@ function computeExpandedLayout(
     focusedItem === undefined
       ? undefined
       : focusedCardTargetTop(focusedItem, options.railHeight, focusedOffset);
-  if (focusedItem !== undefined) focusedItem.focusedTargetTop = focusedTarget;
   pinItemTopInPlace(items, focusedIndex, focusedTarget);
 
   const boundaryTops = items.map(item => item.top);
   const layoutPivotIndex = choosePivotIndex(items, {
     focusedReviewId: options.focusedReviewId,
-    sharedAnchorId: options.layoutAnchorId,
+    previousDriverId: options.previousDriverId,
     scrollDirection: options.scrollDirection,
     scrollMoved: options.scrollMoved,
     railHeight: options.railHeight,
@@ -107,22 +111,15 @@ function computeExpandedLayout(
   pinItemTopInPlace(items, focusedIndex, focusedTarget);
   blendDocumentBoundaries(items, boundaryTops, options);
 
-  const truthfulPivotIndex = chooseTruthfulPivotIndex(
-    items,
-    layoutPivotIndex,
-    options.railHeight,
-  );
   return {
-    items,
+    items: items.map(commitLayoutItem),
     pivotIndex: layoutPivotIndex,
-    sharedAnchorId: items[truthfulPivotIndex]?.id ?? null,
-    layoutAnchorId: items[layoutPivotIndex]?.id ?? null,
     absorbedCollisionKeys,
   };
 }
 
 function assignAutomaticTargets(
-  items: MutableLayoutItem[],
+  items: WorkingLayoutItem[],
   options: ComputeLayoutOptions,
 ): string[] {
   const absorbed: string[] = [];
@@ -141,7 +138,7 @@ function assignAutomaticTargets(
 }
 
 function assignCollisionTargets(
-  group: MutableLayoutItem[],
+  group: WorkingLayoutItem[],
   options: ComputeLayoutOptions,
   absorbed: string[],
 ): void {
@@ -182,12 +179,11 @@ function assignCollisionTargets(
       earlyTop + (lateTop - earlyTop) * effectiveProgress;
     item.groupKey = key;
     item.groupProgress = automaticProgress;
-    item.groupEffectiveProgress = effectiveProgress;
     item.groupTravel = groupTravel;
   }
 }
 
-function forwardCollisionTops(group: readonly MutableLayoutItem[]): number[] {
+function forwardCollisionTops(group: readonly WorkingLayoutItem[]): number[] {
   const tops: number[] = [];
   for (const [index, item] of group.entries()) {
     const previous = group[index - 1];
@@ -200,7 +196,7 @@ function forwardCollisionTops(group: readonly MutableLayoutItem[]): number[] {
   return tops;
 }
 
-function backwardCollisionTops(group: readonly MutableLayoutItem[]): number[] {
+function backwardCollisionTops(group: readonly WorkingLayoutItem[]): number[] {
   const tops: number[] = [];
   for (let index = group.length - 1; index >= 0; index -= 1) {
     const item = group[index];
@@ -216,7 +212,7 @@ function backwardCollisionTops(group: readonly MutableLayoutItem[]): number[] {
 }
 
 function blendDocumentBoundaries(
-  items: MutableLayoutItem[],
+  items: WorkingLayoutItem[],
   boundaryTops: readonly number[],
   geometry: LayoutGeometry,
 ): void {
@@ -248,12 +244,27 @@ function blendDocumentBoundaries(
   }
 }
 
-function emptyLayout(): ExpandedLayout {
+function commitLayoutItem(item: WorkingLayoutItem): LayoutItem {
+  return {
+    id: item.id,
+    naturalTop: item.naturalTop,
+    height: item.height,
+    anchorRect: item.anchorRect,
+    top: item.top,
+    ...(item.groupKey === undefined ? {} : { groupKey: item.groupKey }),
+    ...(item.groupProgress === undefined
+      ? {}
+      : { groupProgress: item.groupProgress }),
+    ...(item.groupTravel === undefined
+      ? {}
+      : { groupTravel: item.groupTravel }),
+  };
+}
+
+function emptyLayout(): ComputedLayout {
   return {
     items: [],
     pivotIndex: -1,
-    sharedAnchorId: null,
-    layoutAnchorId: null,
     absorbedCollisionKeys: [],
   };
 }

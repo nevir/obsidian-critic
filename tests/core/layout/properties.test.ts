@@ -17,7 +17,7 @@ import { assertLegalLayout } from './test-assertions.ts';
 
 const EPSILON = 1e-6;
 
-test('seeded layouts are deterministic, ordered, finite, and truthful', () => {
+test('seeded layouts are deterministic, ordered, and finite', () => {
   const random = mulberry32(49_532);
   for (let iteration = 0; iteration < 500; iteration += 1) {
     const fixture = randomFixture(random);

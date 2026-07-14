@@ -80,9 +80,6 @@ test('empty and singleton layouts have explicit stable behavior', () => {
   assert.deepEqual(empty.layout, {
     items: [],
     pivotIndex: -1,
-    sharedAnchorId: null,
-    layoutAnchorId: null,
-    absorbedCollisionKeys: [],
   });
 
   const singleton = computeExpandedSnapshot(
@@ -90,6 +87,15 @@ test('empty and singleton layouts have explicit stable behavior', () => {
     geometry,
     createScrollState(),
   );
-  assert.equal(singleton.layout.items[0]?.top, 100);
-  assert.equal(singleton.layout.sharedAnchorId, 'only');
+  const item = singleton.layout.items[0];
+  assert.ok(item !== undefined);
+  assert.equal(item.top, 100);
+  assert.equal(singleton.layout.pivotIndex, 0);
+  assert.deepEqual(Object.keys(item).sort(), [
+    'anchorRect',
+    'height',
+    'id',
+    'naturalTop',
+    'top',
+  ]);
 });

@@ -12,28 +12,18 @@ export interface LayoutMeasurement {
 
 export interface LayoutItem extends LayoutMeasurement {
   readonly top: number;
-  readonly desiredTop: number;
-  readonly automaticDesiredTop: number;
   readonly groupKey?: string;
   readonly groupProgress?: number;
-  readonly groupEffectiveProgress?: number;
   readonly groupTravel?: number;
-  readonly focusedTargetTop?: number;
 }
 
-export interface MutableLayoutItem {
-  id: string;
-  naturalTop: number;
-  height: number;
-  anchorRect: AnchorRect;
+export interface WorkingLayoutItem extends LayoutMeasurement {
   top: number;
   desiredTop: number;
   automaticDesiredTop: number;
   groupKey?: string;
   groupProgress?: number;
-  groupEffectiveProgress?: number;
   groupTravel?: number;
-  focusedTargetTop?: number;
 }
 
 export interface LayoutGeometry {
@@ -45,15 +35,11 @@ export interface LayoutGeometry {
 export interface ExpandedLayout {
   readonly items: readonly LayoutItem[];
   readonly pivotIndex: number;
-  readonly sharedAnchorId: string | null;
-  readonly layoutAnchorId: string | null;
-  readonly absorbedCollisionKeys: readonly string[];
 }
 
 export interface ReviewScrollState {
   readonly focusedReviewId: string | null;
   readonly driverId: string | null;
-  readonly visibleAnchorId: string | null;
   readonly scrollDirection: number;
   readonly collisionProgressOffsets: ReadonlyMap<string, number>;
   readonly tallThreadOffsets: ReadonlyMap<string, number>;
@@ -62,7 +48,6 @@ export interface ReviewScrollState {
 export interface ScrollStateOverrides {
   readonly focusedReviewId?: string | null;
   readonly driverId?: string | null;
-  readonly visibleAnchorId?: string | null;
   readonly scrollDirection?: number;
   readonly collisionProgressOffsets?: ReadonlyMap<string, number>;
   readonly tallThreadOffsets?: ReadonlyMap<string, number>;

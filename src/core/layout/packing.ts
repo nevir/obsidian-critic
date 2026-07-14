@@ -1,4 +1,4 @@
-import type { LayoutGeometry, MutableLayoutItem } from './types';
+import type { LayoutGeometry, WorkingLayoutItem } from './types';
 
 export const CARD_GAP = 8;
 
@@ -15,10 +15,10 @@ export function clamp(value: number, minimum: number, maximum: number): number {
 }
 
 export function buildCollisionGroups(
-  items: readonly MutableLayoutItem[],
-): MutableLayoutItem[][] {
-  const groups: MutableLayoutItem[][] = [];
-  let current: MutableLayoutItem[] = [];
+  items: readonly WorkingLayoutItem[],
+): WorkingLayoutItem[][] {
+  const groups: WorkingLayoutItem[][] = [];
+  let current: WorkingLayoutItem[] = [];
   let naturalEnd = Number.NEGATIVE_INFINITY;
 
   for (const item of items) {
@@ -34,7 +34,7 @@ export function buildCollisionGroups(
   return groups;
 }
 
-export function projectNonOverlappingTops(items: MutableLayoutItem[]): void {
+export function projectNonOverlappingTops(items: WorkingLayoutItem[]): void {
   const cumulativeOffsets: number[] = [];
   const blocks: ProjectionBlock[] = [];
   let cumulativeOffset = 0;
@@ -87,7 +87,7 @@ export function projectNonOverlappingTops(items: MutableLayoutItem[]): void {
 }
 
 export function solveProjectedTops(
-  items: MutableLayoutItem[],
+  items: WorkingLayoutItem[],
   geometry: LayoutGeometry,
 ): void {
   for (const item of items) item.desiredTop = item.automaticDesiredTop;
@@ -96,7 +96,7 @@ export function solveProjectedTops(
 }
 
 export function constrainProjectedTopsToDocument(
-  items: MutableLayoutItem[],
+  items: WorkingLayoutItem[],
   { documentTop, documentBottom, railHeight }: LayoutGeometry,
 ): void {
   const first = items[0];
@@ -139,7 +139,7 @@ export function constrainProjectedTopsToDocument(
   }
 }
 
-function packForward(items: MutableLayoutItem[]): void {
+function packForward(items: WorkingLayoutItem[]): void {
   for (let index = 1; index < items.length; index += 1) {
     const previous = items[index - 1];
     const current = items[index];
@@ -151,7 +151,7 @@ function packForward(items: MutableLayoutItem[]): void {
   }
 }
 
-function packBackward(items: MutableLayoutItem[]): void {
+function packBackward(items: WorkingLayoutItem[]): void {
   for (let index = items.length - 2; index >= 0; index -= 1) {
     const current = items[index];
     const next = items[index + 1];

@@ -1,15 +1,15 @@
 import { CARD_GAP } from './packing';
-import type { LayoutItem, MutableLayoutItem } from './types';
+import type { LayoutItem, WorkingLayoutItem } from './types';
 
 interface DriverOptions {
   readonly focusedReviewId: string | null;
-  readonly sharedAnchorId: string | null;
+  readonly previousDriverId: string | null;
   readonly scrollDirection: number;
   readonly scrollMoved: boolean;
   readonly railHeight: number;
 }
 
-export function itemCanOwnAnchor(
+function itemCanOwnAnchor(
   item: Pick<LayoutItem, 'naturalTop' | 'top' | 'height'>,
 ): boolean {
   return (
@@ -19,7 +19,7 @@ export function itemCanOwnAnchor(
 }
 
 export function correctAnchorInPlace(
-  items: MutableLayoutItem[],
+  items: WorkingLayoutItem[],
   index: number,
 ): void {
   const item = items[index];
@@ -38,7 +38,7 @@ export function choosePivotIndex(
 ): number {
   const {
     focusedReviewId,
-    sharedAnchorId,
+    previousDriverId,
     scrollDirection,
     scrollMoved,
     railHeight,
@@ -59,8 +59,8 @@ export function choosePivotIndex(
     }
   }
 
-  const previousIndex = sharedAnchorId
-    ? items.findIndex(item => item.id === sharedAnchorId)
+  const previousIndex = previousDriverId
+    ? items.findIndex(item => item.id === previousDriverId)
     : -1;
   if (previousIndex >= 0) {
     const previous = items[previousIndex];
@@ -103,21 +103,7 @@ export function choosePivotIndex(
     : nearestToCenter(candidates, railCenter).index;
 }
 
-export function chooseTruthfulPivotIndex(
-  items: readonly LayoutItem[],
-  preferredIndex: number,
-  railHeight: number,
-): number {
-  const preferred = items[preferredIndex];
-  if (preferred !== undefined && itemCanOwnAnchor(preferred))
-    return preferredIndex;
-  const candidates = eligibleCandidates(items, railHeight);
-  return candidates.length === 0
-    ? -1
-    : nearestToCenter(candidates, railHeight / 2).index;
-}
-
-function anchorEdgeCorrection(item: MutableLayoutItem): number {
+function anchorEdgeCorrection(item: WorkingLayoutItem): number {
   if (item.naturalTop < item.top) return item.naturalTop - item.top;
   if (item.naturalTop > item.top + item.height) {
     return item.naturalTop - (item.top + item.height);
@@ -125,7 +111,7 @@ function anchorEdgeCorrection(item: MutableLayoutItem): number {
   return 0;
 }
 
-function propagateBackward(items: MutableLayoutItem[], index: number): void {
+function propagateBackward(items: WorkingLayoutItem[], index: number): void {
   for (let itemIndex = index - 1; itemIndex >= 0; itemIndex -= 1) {
     const current = items[itemIndex];
     const next = items[itemIndex + 1];
@@ -136,7 +122,7 @@ function propagateBackward(items: MutableLayoutItem[], index: number): void {
   }
 }
 
-function propagateForward(items: MutableLayoutItem[], index: number): void {
+function propagateForward(items: WorkingLayoutItem[], index: number): void {
   for (let itemIndex = index + 1; itemIndex < items.length; itemIndex += 1) {
     const previous = items[itemIndex - 1];
     const current = items[itemIndex];

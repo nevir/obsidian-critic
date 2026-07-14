@@ -6,7 +6,6 @@ export function createScrollState(
   return {
     focusedReviewId: overrides.focusedReviewId ?? null,
     driverId: overrides.driverId ?? null,
-    visibleAnchorId: overrides.visibleAnchorId ?? null,
     scrollDirection: overrides.scrollDirection ?? 0,
     collisionProgressOffsets: cloneOffsetMap(
       overrides.collisionProgressOffsets,
@@ -34,7 +33,6 @@ export function scrollStateWithFocus(
     ...state,
     focusedReviewId,
     driverId: focusedReviewId,
-    visibleAnchorId: focusedReviewId,
     collisionProgressOffsets: new Map(),
     tallThreadOffsets: new Map(),
   };
@@ -47,7 +45,6 @@ export function scrollStateWithoutFocus(
     ...state,
     focusedReviewId: null,
     driverId: null,
-    visibleAnchorId: null,
     collisionProgressOffsets: new Map(),
     tallThreadOffsets: new Map(),
   };

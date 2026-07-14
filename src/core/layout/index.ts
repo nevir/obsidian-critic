@@ -2,7 +2,6 @@ export { computeExpandedSnapshot } from './compute';
 export {
   choosePivotIndex,
   correctAnchorInPlace,
-  itemCanOwnAnchor,
 } from './driver';
 export { focusedCardTargetTop, pinItemTopInPlace } from './focus';
 export {

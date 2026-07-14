@@ -1,5 +1,5 @@
 import { CARD_GAP, clamp } from './packing';
-import type { LayoutMeasurement, MutableLayoutItem } from './types';
+import type { LayoutMeasurement, WorkingLayoutItem } from './types';
 
 export function focusedCardTargetTop(
   item: Pick<LayoutMeasurement, 'naturalTop' | 'height'> | undefined,
@@ -30,7 +30,7 @@ export function focusedCardTargetTop(
 }
 
 export function pinItemTopInPlace(
-  items: MutableLayoutItem[],
+  items: WorkingLayoutItem[],
   index: number,
   targetTop = items[index]?.naturalTop,
 ): void {

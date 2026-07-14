@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import {
   CARD_GAP,
   type ExpandedLayout,
-  itemCanOwnAnchor,
 } from '../../../src/core/layout/index.ts';
 
 const EPSILON = 1e-6;
@@ -25,13 +24,6 @@ export function assertLegalLayout(
     assert.ok(
       Number.isFinite(item.top),
       `${context}: ${item.id} is not finite`,
-    );
-  }
-  if (layout.sharedAnchorId !== null) {
-    const shared = layout.items.find(item => item.id === layout.sharedAnchorId);
-    assert.ok(
-      shared !== undefined && itemCanOwnAnchor(shared),
-      `${context}: shared anchor is not truthful`,
     );
   }
 }

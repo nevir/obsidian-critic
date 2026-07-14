@@ -77,7 +77,6 @@ export class ReviewRail {
       visibleIds.add(item.id);
       const element = card.element;
       element.style.top = `${item.top}px`;
-      element.style.removeProperty('transform');
       const cardNear =
         item.top + item.height >= -80 && item.top <= railHeight + 80;
       const anchorNear =
@@ -88,10 +87,6 @@ export class ReviewRail {
       element.classList.toggle(
         'critic-collided',
         Math.abs(item.top - item.naturalTop) > 2 || item.groupKey !== undefined,
-      );
-      element.classList.toggle(
-        'critic-shared-anchor',
-        item.id === layout.sharedAnchorId,
       );
       commitNib(element, item.anchorRect.top - item.top, item.height);
     }
@@ -106,11 +101,9 @@ export class ReviewRail {
     for (const card of this.cards.values()) {
       card.setVisible(true);
       card.element.style.removeProperty('top');
-      card.element.style.removeProperty('transform');
       card.element.classList.remove(
         'critic-offscreen',
         'critic-collided',
-        'critic-shared-anchor',
         'critic-nib-hidden',
         'critic-nib-top',
         'critic-nib-bottom',

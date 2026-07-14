@@ -380,7 +380,6 @@
   display: flex;
   max-height: min(62dvh, calc(100% - 24px - var(--critic-host-bottom-inset)));
   flex-direction: column;
-  transform: none;
 }
 
 .critic-review-sheet .critic-review-card::before,

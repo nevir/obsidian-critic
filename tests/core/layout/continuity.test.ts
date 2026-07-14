@@ -3,14 +3,12 @@ import test from 'node:test';
 
 import {
   beginCommentLaneScroll,
-  CARD_GAP,
   clamp,
   computeExpandedSnapshot,
   createScrollState,
   type ExpandedLayout,
   finishCommentLaneScroll,
   focusedCardTargetTop,
-  itemCanOwnAnchor,
   type ReviewScrollState,
   scrollStateForDocumentDelta,
   scrollStateWithFocus,
@@ -22,6 +20,7 @@ import {
   measurementsAt,
   RAIL_HEIGHT,
 } from '../../fixtures/layout.ts';
+import { assertLegalLayout } from './test-assertions.ts';
 
 const MAX_CARD_DELTA_PER_PIXEL = 4;
 const EPSILON = 1e-6;
@@ -80,34 +79,18 @@ function compute(harness: Harness, scrollMoved: boolean): ExpandedLayout {
   return snapshot.layout;
 }
 
-function assertLegal(layout: ExpandedLayout, context: string): void {
-  for (let index = 1; index < layout.items.length; index += 1) {
-    const previous = layout.items[index - 1];
-    const current = layout.items[index];
-    assert.ok(previous !== undefined && current !== undefined);
-    assert.ok(
-      current.top >= previous.top + previous.height + CARD_GAP - EPSILON,
-      `${context}: ${previous.id}/${current.id} overlap`,
-    );
-  }
-  if (layout.sharedAnchorId !== null) {
-    const shared = layout.items.find(item => item.id === layout.sharedAnchorId);
-    assert.ok(shared !== undefined && itemCanOwnAnchor(shared), context);
-  }
-}
-
 function assertContinuous(
   previous: ExpandedLayout,
   current: ExpandedLayout,
   direction: number,
   context: string,
 ): void {
-  assertLegal(current, context);
+  assertLegalLayout(current, context);
   for (const [index, item] of current.items.entries()) {
     const oldItem = previous.items[index];
     assert.ok(oldItem !== undefined);
     const delta = item.top - oldItem.top;
-    const handoff = `${previous.sharedAnchorId}->${current.sharedAnchorId}`;
+    const handoff = `${driverId(previous)}->${driverId(current)}`;
     assert.ok(
       direction * delta <= EPSILON,
       `${context}: ${item.id} reversed ${delta}px (${handoff})`,
@@ -143,8 +126,7 @@ function documentStep(
     layout.items.map(item => item.top),
     `no-motion layout changed at ${next}`,
   );
-  assert.equal(settled.sharedAnchorId, layout.sharedAnchorId);
-  assert.equal(settled.layoutAnchorId, layout.layoutAnchorId);
+  assert.equal(driverId(settled), driverId(layout));
   return settled;
 }
 
@@ -194,12 +176,16 @@ function sweep(
   ) => ExpandedLayout,
 ): void {
   const { harness, layout: initial } = createHarness(focusedReviewId);
-  assertLegal(initial, `initial ${focusedReviewId ?? 'unfocused'}`);
+  assertLegalLayout(initial, `initial ${focusedReviewId ?? 'unfocused'}`);
   let layout = initial;
   while (harness.scrollTop < MAX_SCROLL_TOP) {
     layout = step(harness, layout, 1);
   }
   while (harness.scrollTop > 0) layout = step(harness, layout, -1);
+}
+
+function driverId(layout: ExpandedLayout): string | null {
+  return layout.items[layout.pivotIndex]?.id ?? null;
 }
 
 for (const focus of [null, ...exampleCards.map(card => card.id)]) {
