@@ -46,28 +46,43 @@
 }
 
 .critic-annotation-expanded {
-  border-radius: 3px;
   background: color-mix(in srgb, var(--text-muted) 9%, transparent);
-  box-shadow: inset 0 0 0 1px var(--background-modifier-border-hover);
+  box-shadow: none;
   color: var(--text-muted);
   text-decoration: none;
 }
 
 /* Critic substitutions look like Markdown strikethrough to Obsidian. */
-.critic-live-preview .critic-annotation-expanded.cm-strikethrough,
-.critic-live-preview .critic-annotation-expanded .cm-strikethrough {
+.critic-live-preview .critic-substitution-host {
   text-decoration: none;
 }
 
-.critic-annotation.critic-focused,
+.critic-annotation.critic-focused {
+  outline: none;
+  box-shadow: inset 0 -3px 0
+    color-mix(in srgb, var(--interactive-accent) 72%, transparent);
+}
+
+.critic-annotation-expanded.critic-focused {
+  background: color-mix(
+    in srgb,
+    var(--interactive-accent) 14%,
+    var(--background-primary)
+  );
+  box-shadow: inset 0 -2px 0 var(--interactive-accent);
+  color: var(--text-normal);
+}
+
 .critic-inline-anchor.critic-focused {
   outline: 3px solid
     color-mix(in srgb, var(--interactive-accent) 42%, transparent);
   outline-offset: 2px;
 }
 
-.critic-annotation-expanded .critic-annotation.critic-focused {
-  outline: none;
+.critic-substitution-separator {
+  margin: 0 0.32em;
+  color: var(--text-faint);
+  text-decoration: none;
 }
 
 .critic-inline-anchor {
@@ -213,14 +228,6 @@
   z-index: 3;
   box-shadow: 0 5px 18px
     color-mix(in srgb, var(--interactive-accent) 22%, transparent);
-}
-
-.critic-review-card.critic-shared-anchor:not(.critic-focused) {
-  --critic-current-border: color-mix(
-    in srgb,
-    var(--interactive-accent) 40%,
-    var(--background-modifier-border)
-  );
 }
 
 .critic-review-card.critic-collided {

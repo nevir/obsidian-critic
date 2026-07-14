@@ -18,10 +18,29 @@ function decorationRange(spec: DecorationSpec): Range<Decoration> {
       }).range(spec.from, spec.to);
     case 'replace':
       return Decoration.replace({}).range(spec.from, spec.to);
+    case 'separator':
+      return Decoration.replace({ widget: new ChangeSeparatorWidget() }).range(
+        spec.from,
+        spec.to,
+      );
     case 'widget':
       return Decoration.widget({
         widget: new ReviewAnchorWidget(spec.reviewId, spec.role),
       }).range(spec.at);
+  }
+}
+
+class ChangeSeparatorWidget extends WidgetType {
+  override eq(other: ChangeSeparatorWidget): boolean {
+    return other instanceof ChangeSeparatorWidget;
+  }
+
+  override toDOM(): HTMLElement {
+    const separator = document.createElement('span');
+    separator.className = 'critic-substitution-separator';
+    separator.textContent = '→';
+    separator.setAttribute('aria-label', 'replaced with');
+    return separator;
   }
 }
 

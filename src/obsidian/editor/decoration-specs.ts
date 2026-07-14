@@ -27,6 +27,11 @@ export type DecorationSpec =
       readonly to: number;
     }
   | {
+      readonly kind: 'separator';
+      readonly from: number;
+      readonly to: number;
+    }
+  | {
       readonly kind: 'widget';
       readonly at: number;
       readonly reviewId: string;
@@ -81,7 +86,9 @@ function anchorSpecs(reviewId: string, mark: AnchorMark): DecorationSpec[] {
   return [
     hiddenRange(mark.opener),
     ...visibleRanges(reviewId, mark),
-    ...(mark.kind === 'substitution' ? [hiddenRange(mark.separator)] : []),
+    ...(mark.kind === 'substitution'
+      ? [{ kind: 'separator' as const, ...mark.separator }]
+      : []),
     hiddenRange(mark.closer),
   ];
 }

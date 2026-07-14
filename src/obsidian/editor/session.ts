@@ -21,6 +21,7 @@ import {
   type ReviewAction,
 } from '../review/presentation';
 import { ReviewSurfaceController } from '../review/surface';
+import { reconcileAnnotationDom } from './annotation-dom';
 import type { CriticEditorHost } from './host';
 import { criticEditorStateField } from './live-preview-state';
 import { criticEditorRootAttributes } from './root-attributes';
@@ -50,6 +51,7 @@ export class CriticEditorSession implements PluginValue {
     );
     host.attachSession(this);
     this.syncSurface();
+    this.syncAnnotationDom();
   }
 
   get sourcePath(): string {
@@ -98,13 +100,18 @@ export class CriticEditorSession implements PluginValue {
     ) {
       this.surface.schedule();
     }
-    if (update.docChanged || update.viewportChanged || modeChanged) {
-      this.syncFocusClasses();
+    if (
+      update.docChanged ||
+      update.selectionSet ||
+      update.viewportChanged ||
+      modeChanged
+    ) {
+      this.syncAnnotationDom();
     }
   }
 
   docViewUpdate(): void {
-    this.syncFocusClasses();
+    this.syncAnnotationDom();
     this.surface.schedule();
   }
 
@@ -117,7 +124,7 @@ export class CriticEditorSession implements PluginValue {
     const review = this.reviewById(reviewId);
     if (review === undefined) return false;
     this.focusedReviewId = reviewId;
-    this.syncFocusClasses();
+    this.syncAnnotationDom();
     this.surface.setFocus(reviewId, this.sourcePath);
     if (scrollIntoView) {
       this.view.dispatch({
@@ -133,7 +140,7 @@ export class CriticEditorSession implements PluginValue {
   clearFocus(): void {
     if (this.focusedReviewId === null) return;
     this.focusedReviewId = null;
-    this.syncFocusClasses();
+    this.syncAnnotationDom();
     this.surface.setFocus(null, this.sourcePath);
   }
 
@@ -200,16 +207,8 @@ export class CriticEditorSession implements PluginValue {
     );
   }
 
-  private syncFocusClasses(): void {
-    const focusedId = this.focusedReviewId;
-    for (const element of this.view.dom.querySelectorAll<HTMLElement>(
-      '[data-critic-review-id]',
-    )) {
-      element.classList.toggle(
-        'critic-focused',
-        element.dataset['criticReviewId'] === focusedId,
-      );
-    }
+  private syncAnnotationDom(): void {
+    reconcileAnnotationDom(this.view.dom, this.focusedReviewId);
   }
 }
 

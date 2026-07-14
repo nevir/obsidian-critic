@@ -21,6 +21,7 @@ test('maps plain descriptions to sorted CodeMirror decorations', () => {
       annotationClass: 'addition',
       reviewId: 'change',
     },
+    { kind: 'separator', from: 8, to: 10 },
   ]);
   const ranges: Array<{
     readonly from: number;
@@ -36,6 +37,7 @@ test('maps plain descriptions to sorted CodeMirror decorations', () => {
     [
       { from: 0, to: 3 },
       { from: 3, to: 7 },
+      { from: 8, to: 10 },
       { from: 12, to: 12 },
     ],
   );

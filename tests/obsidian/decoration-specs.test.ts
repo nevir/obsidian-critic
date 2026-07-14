@@ -19,7 +19,11 @@ test('maps every canonical mark to compact visible content', () => {
     'replacement',
     'highlight',
   ]);
-  assert.equal(specs.filter(spec => spec.kind === 'replace').length, 11);
+  assert.equal(specs.filter(spec => spec.kind === 'replace').length, 10);
+  assert.deepEqual(
+    specs.filter(spec => spec.kind === 'separator'),
+    [{ kind: 'separator', from: 29, to: 31 }],
+  );
   assert.deepEqual(
     specs.filter(spec => spec.kind === 'widget'),
     [{ kind: 'widget', at: 60, reviewId: 'review-60', role: 'point' }],
@@ -49,7 +53,11 @@ test('keeps selected CriticMarkup source directly editable as one expression', (
     { from: source.indexOf('why'), to: source.indexOf('why') },
   ]);
 
-  assert.equal(compact.filter(spec => spec.kind === 'replace').length, 4);
+  assert.equal(compact.filter(spec => spec.kind === 'replace').length, 3);
+  assert.deepEqual(
+    compact.filter(spec => spec.kind === 'separator'),
+    [{ kind: 'separator', from: 13, to: 15 }],
+  );
   assert.deepEqual(markClasses(selected), [
     'expanded',
     'original',
@@ -64,6 +72,10 @@ test('keeps selected CriticMarkup source directly editable as one expression', (
   });
   assert.equal(
     selected.some(spec => spec.kind === 'replace'),
+    false,
+  );
+  assert.equal(
+    selected.some(spec => spec.kind === 'separator'),
     false,
   );
 });
