@@ -17,7 +17,8 @@ export interface ReviewPresentation {
   readonly id: string;
   readonly change: ReviewChangePresentation | null;
   readonly messages: readonly ReviewMessagePresentation[];
-  readonly actions: readonly ReviewAction[];
+  readonly headerActions: readonly ReviewAction[];
+  readonly canResolveDiscussion: boolean;
 }
 
 export function buildReviewPresentations(
@@ -30,7 +31,9 @@ export function buildReviewPresentations(
     id: review.id,
     change: changePresentation(review),
     messages: messagePresentations(review.messages, showAuthors),
-    actions: reviewActions(review),
+    headerActions: headerActions(review),
+    canResolveDiscussion:
+      review.kind === 'suggestion' && review.messages.length > 0,
   }));
 }
 
@@ -65,9 +68,7 @@ function messagePresentations(
   });
 }
 
-function reviewActions(review: ReviewItem): readonly ReviewAction[] {
+function headerActions(review: ReviewItem): readonly ReviewAction[] {
   if (review.kind === 'comment') return ['resolve'];
-  return review.messages.length === 0
-    ? ['reject', 'accept']
-    : ['reject', 'resolve', 'accept'];
+  return ['reject', 'accept'];
 }

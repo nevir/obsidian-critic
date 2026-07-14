@@ -14,22 +14,28 @@ test('presents suggestion previews and lifecycle actions', () => {
   ).reviews;
 
   assert.deepEqual(
-    buildReviewPresentations(reviews).map(({ change, actions }) => ({
-      change,
-      actions,
-    })),
+    buildReviewPresentations(reviews).map(
+      ({ change, headerActions, canResolveDiscussion }) => ({
+        change,
+        headerActions,
+        canResolveDiscussion,
+      }),
+    ),
     [
       {
         change: { original: null, proposed: 'add' },
-        actions: ['reject', 'accept'],
+        headerActions: ['reject', 'accept'],
+        canResolveDiscussion: false,
       },
       {
         change: { original: 'remove', proposed: null },
-        actions: ['reject', 'accept'],
+        headerActions: ['reject', 'accept'],
+        canResolveDiscussion: false,
       },
       {
         change: { original: 'old', proposed: 'new' },
-        actions: ['reject', 'resolve', 'accept'],
+        headerActions: ['reject', 'accept'],
+        canResolveDiscussion: true,
       },
     ],
   );
@@ -75,13 +81,15 @@ test('range and point comments resolve without a type title model', () => {
       id: 'review-0',
       change: null,
       messages: [{ id: 'comment-11', authorLabel: null, markdown: 'note' }],
-      actions: ['resolve'],
+      headerActions: ['resolve'],
+      canResolveDiscussion: false,
     },
     {
       id: 'review-22',
       change: null,
       messages: [{ id: 'comment-22', authorLabel: null, markdown: 'point' }],
-      actions: ['resolve'],
+      headerActions: ['resolve'],
+      canResolveDiscussion: false,
     },
   ]);
 });
