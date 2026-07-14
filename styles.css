@@ -1,0 +1,378 @@
+.critic-editor {
+  --critic-rail-width: 320px;
+  --critic-rail-gap: 20px;
+  --critic-card-border: var(--background-modifier-border);
+  --critic-card-surface: var(--background-primary);
+  --critic-comment: var(--interactive-accent);
+  --critic-add: var(--color-green);
+  --critic-delete: var(--color-red);
+  --critic-highlight: var(--color-yellow);
+  position: relative;
+}
+
+.critic-editor.critic-expanded .cm-scroller {
+  padding-right: calc(var(--critic-rail-width) + var(--critic-rail-gap));
+}
+
+.critic-annotation {
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    box-shadow 120ms ease,
+    opacity 120ms ease;
+}
+
+.critic-annotation-addition,
+.critic-annotation-replacement {
+  background: color-mix(in srgb, var(--critic-add) 18%, transparent);
+  box-shadow: inset 0 -2px 0 var(--critic-add);
+}
+
+.critic-annotation-deletion,
+.critic-annotation-original {
+  background: color-mix(in srgb, var(--critic-delete) 15%, transparent);
+  box-shadow: inset 0 -2px 0 var(--critic-delete);
+  text-decoration: line-through;
+  text-decoration-color: var(--critic-delete);
+}
+
+.critic-annotation-highlight {
+  background: color-mix(in srgb, var(--critic-highlight) 22%, transparent);
+  box-shadow: inset 0 -2px 0 var(--critic-highlight);
+}
+
+.critic-annotation.critic-focused,
+.critic-inline-anchor.critic-focused {
+  outline: 3px solid
+    color-mix(in srgb, var(--interactive-accent) 42%, transparent);
+  outline-offset: 2px;
+}
+
+.critic-inline-anchor {
+  display: inline-grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  margin: 0 2px;
+  padding: 0;
+  border: 2px solid var(--background-primary);
+  border-radius: 50%;
+  background: var(--critic-comment);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 20%);
+  vertical-align: text-top;
+  cursor: pointer;
+}
+
+.critic-inline-anchor::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-on-accent);
+}
+
+.critic-inline-anchor-empty {
+  background: var(--background-primary);
+  border-color: var(--critic-comment);
+}
+
+.critic-inline-anchor-empty::after {
+  background: var(--critic-comment);
+}
+
+.critic-review-rail,
+.critic-review-sheet {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.critic-review-rail {
+  position: absolute;
+  z-index: 20;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--critic-rail-width);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.critic-expanded .critic-review-rail {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.critic-review-card {
+  --critic-nib-y: 18px;
+  --critic-current-border: var(--critic-card-border);
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 4px;
+  left: 16px;
+  overflow: visible;
+  border: 1px solid var(--critic-current-border);
+  border-left-width: 3px;
+  border-radius: 8px;
+  background: var(--critic-card-surface);
+  box-shadow: 0 3px 12px rgb(0 0 0 / 10%);
+  color: var(--text-normal);
+  opacity: 1;
+  transition:
+    opacity 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.critic-review-card::before,
+.critic-review-card::after {
+  content: "";
+  position: absolute;
+  left: -15px;
+  width: 15px;
+  height: 16px;
+  pointer-events: none;
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+}
+
+.critic-review-card::before {
+  top: calc(var(--critic-nib-y) - 8px);
+  background: var(--critic-current-border);
+}
+
+.critic-review-card::after {
+  top: calc(var(--critic-nib-y) - 7px);
+  left: -13px;
+  width: 13px;
+  height: 14px;
+  background: var(--critic-card-surface);
+}
+
+.critic-review-card.critic-nib-top {
+  border-top-left-radius: 0;
+}
+
+.critic-review-card.critic-nib-top .critic-card-header {
+  border-top-left-radius: 0;
+}
+
+.critic-review-card.critic-nib-top::before,
+.critic-review-card.critic-nib-top::after {
+  top: -1px;
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+.critic-review-card.critic-nib-top::after {
+  top: 0;
+}
+
+.critic-review-card.critic-nib-bottom {
+  border-bottom-left-radius: 0;
+}
+
+.critic-review-card.critic-nib-bottom::before,
+.critic-review-card.critic-nib-bottom::after {
+  top: auto;
+  bottom: -1px;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.critic-review-card.critic-nib-bottom::after {
+  bottom: 0;
+}
+
+.critic-review-card.critic-nib-hidden::before,
+.critic-review-card.critic-nib-hidden::after {
+  display: none;
+}
+
+.critic-review-card.critic-focused {
+  --critic-current-border: var(--interactive-accent);
+  z-index: 3;
+  box-shadow: 0 5px 18px
+    color-mix(in srgb, var(--interactive-accent) 22%, transparent);
+}
+
+.critic-review-card.critic-shared-anchor:not(.critic-focused) {
+  --critic-current-border: color-mix(
+    in srgb,
+    var(--interactive-accent) 40%,
+    var(--background-modifier-border)
+  );
+}
+
+.critic-review-card.critic-collided {
+  box-shadow:
+    -3px 0 0 color-mix(in srgb, var(--interactive-accent) 10%, transparent),
+    0 3px 12px rgb(0 0 0 / 10%);
+}
+
+.critic-review-card.critic-offscreen {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.critic-card-header {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 4px 5px 4px 9px;
+  border-radius: 8px 8px 0 0;
+}
+
+.critic-card-position {
+  color: var(--text-faint);
+  font-size: 9px;
+}
+
+.critic-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.critic-card-action-placeholder,
+.critic-card-action {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.critic-card-action {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.critic-card-action:hover,
+.critic-card-action:focus-visible {
+  background: var(--background-modifier-hover);
+}
+
+.critic-card-action-accept,
+.critic-card-action-resolve {
+  color: var(--critic-add);
+}
+
+.critic-card-action-reject {
+  color: var(--critic-delete);
+}
+
+.critic-card-body {
+  padding: 4px 10px 9px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.critic-change-preview {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  margin: 5px 0 7px;
+  overflow-wrap: anywhere;
+  font-size: var(--font-ui-small);
+  white-space: pre-wrap;
+}
+
+.critic-change-original {
+  color: var(--critic-delete);
+  text-decoration: line-through;
+}
+
+.critic-change-proposed {
+  color: var(--critic-add);
+}
+
+.critic-change-arrow {
+  color: var(--text-faint);
+}
+
+.critic-card-message {
+  padding: 7px 0;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.critic-card-message:first-child {
+  border-top: 0;
+}
+
+.critic-card-author {
+  margin-bottom: 2px;
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.critic-card-message-content {
+  color: var(--text-normal);
+  font-size: 12px;
+  line-height: 1.38;
+}
+
+.critic-card-message-content > :first-child {
+  margin-top: 0;
+}
+
+.critic-card-message-content > :last-child {
+  margin-bottom: 0;
+}
+
+.critic-resolve-discussion {
+  width: auto;
+  height: auto;
+  margin: 5px 0 0 auto;
+  padding: 4px 6px;
+  font-size: var(--font-ui-smaller);
+  font-weight: 500;
+}
+
+.critic-review-sheet {
+  position: absolute;
+  z-index: 30;
+  right: 8px;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  left: 8px;
+  max-height: min(62dvh, calc(100% - 24px));
+}
+
+.critic-sheet-mode .critic-review-sheet.critic-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.critic-review-sheet .critic-review-card {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  display: flex;
+  max-height: min(62dvh, calc(100% - 24px));
+  flex-direction: column;
+  transform: none;
+}
+
+.critic-review-sheet .critic-review-card::before,
+.critic-review-sheet .critic-review-card::after {
+  display: none;
+}
+
+.critic-review-sheet .critic-card-body {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+@media print {
+  .critic-review-rail,
+  .critic-review-sheet,
+  .critic-inline-anchor {
+    display: none;
+  }
+}

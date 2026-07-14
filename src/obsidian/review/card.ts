@@ -9,6 +9,7 @@ import type {
 
 export interface ReviewCardCallbacks {
   readonly focus: (reviewId: string) => void;
+  readonly clearFocus: () => void;
   readonly act: (reviewId: string, action: ReviewAction) => void;
 }
 
@@ -54,6 +55,11 @@ export class ReviewCard {
 
   setFocused(focused: boolean): void {
     this.element.classList.toggle('critic-focused', focused);
+  }
+
+  setVisible(visible: boolean): void {
+    this.element.tabIndex = visible ? 0 : -1;
+    this.element.toggleAttribute('aria-hidden', !visible);
   }
 
   destroy(): void {

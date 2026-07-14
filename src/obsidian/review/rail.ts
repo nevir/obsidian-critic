@@ -18,6 +18,7 @@ export class ReviewRail {
     this.element = document.createElement('aside');
     this.element.className = 'critic-review-rail';
     this.element.setAttribute('aria-label', 'Review margin');
+    this.element.addEventListener('click', this.handleBackgroundClick);
     parent.append(this.element);
     this.resizeObserver = new ResizeObserver(onResize);
   }
@@ -76,7 +77,9 @@ export class ReviewRail {
         item.top + item.height >= -80 && item.top <= railHeight + 80;
       const anchorNear =
         item.anchorRect.bottom >= -80 && item.anchorRect.top <= railHeight + 80;
-      element.classList.toggle('critic-offscreen', !cardNear && !anchorNear);
+      const visible = cardNear || anchorNear;
+      card.setVisible(visible);
+      element.classList.toggle('critic-offscreen', !visible);
       element.classList.toggle(
         'critic-collided',
         Math.abs(item.top - item.naturalTop) > 2 || item.groupKey !== undefined,
@@ -88,12 +91,15 @@ export class ReviewRail {
       commitNib(element, item.anchorRect.top - item.top, item.height);
     }
     for (const [id, card] of this.cards) {
-      if (!visibleIds.has(id)) card.element.classList.add('critic-offscreen');
+      if (visibleIds.has(id)) continue;
+      card.setVisible(false);
+      card.element.classList.add('critic-offscreen');
     }
   }
 
   clearLayout(): void {
     for (const card of this.cards.values()) {
+      card.setVisible(true);
       card.element.style.removeProperty('transform');
       card.element.classList.remove(
         'critic-offscreen',
@@ -108,10 +114,15 @@ export class ReviewRail {
 
   destroy(): void {
     this.resizeObserver.disconnect();
+    this.element.removeEventListener('click', this.handleBackgroundClick);
     for (const card of this.cards.values()) card.destroy();
     this.cards.clear();
     this.element.remove();
   }
+
+  private readonly handleBackgroundClick = (event: MouseEvent): void => {
+    if (event.target === this.element) this.callbacks.clearFocus();
+  };
 }
 
 function commitNib(element: HTMLElement, nib: number, height: number): void {

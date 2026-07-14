@@ -8,12 +8,22 @@ import {
 import { editorInfoField, editorLivePreviewField } from 'obsidian';
 
 import type { ParsedDocument, ReviewItem, SourceRange } from '../../core/model';
+import {
+  acceptReview,
+  rejectReview,
+  resolveReview,
+} from '../../core/mutations';
 import { parseCriticMarkup } from '../../core/syntax/index';
 import {
   adjacentReviewId,
   type NavigationDirection,
   reconcileFocusedReviewId,
 } from '../review/navigation';
+import {
+  buildReviewPresentations,
+  type ReviewAction,
+} from '../review/presentation';
+import { ReviewSurfaceController } from '../review/surface';
 import { buildDecorationSpecs } from './decoration-specs';
 import { createDecorationSet } from './decorations';
 import type { CriticEditorHost } from './host';
@@ -23,6 +33,7 @@ export class CriticEditorSession implements PluginValue {
   private parsed: ParsedDocument;
   private livePreview: boolean;
   private focusedReviewId: string | null = null;
+  private readonly surface: ReviewSurfaceController;
 
   constructor(
     readonly view: EditorView,
@@ -32,7 +43,13 @@ export class CriticEditorSession implements PluginValue {
     this.livePreview = readLivePreview(view);
     this.rebuildDecorations();
     this.syncEditorClass();
+    this.surface = new ReviewSurfaceController(view, host.app, {
+      focus: reviewId => this.focusReview(reviewId),
+      clearFocus: () => this.clearFocus(),
+      act: (reviewId, action) => this.applyReviewAction(reviewId, action),
+    });
     host.attachSession(this);
+    this.syncSurface();
   }
 
   get sourcePath(): string {
@@ -65,6 +82,17 @@ export class CriticEditorSession implements PluginValue {
     if (update.docChanged || update.selectionSet || modeChanged) {
       this.rebuildDecorations();
     }
+    if (update.docChanged || modeChanged) this.syncSurface();
+    if (
+      update.docChanged ||
+      update.selectionSet ||
+      update.viewportChanged ||
+      update.geometryChanged ||
+      update.heightChanged ||
+      modeChanged
+    ) {
+      this.surface.schedule();
+    }
     if (update.docChanged || update.viewportChanged || modeChanged) {
       this.syncEditorClass();
       this.syncFocusClasses();
@@ -73,11 +101,18 @@ export class CriticEditorSession implements PluginValue {
 
   docViewUpdate(): void {
     this.syncFocusClasses();
+    this.surface.schedule();
   }
 
   destroy(): void {
+    this.surface.destroy();
     this.host.detachSession(this);
-    this.view.dom.classList.remove('critic-editor', 'critic-live-preview');
+    this.view.dom.classList.remove(
+      'critic-editor',
+      'critic-live-preview',
+      'critic-expanded',
+      'critic-sheet-mode',
+    );
   }
 
   focusReview(reviewId: string): boolean {
@@ -85,6 +120,7 @@ export class CriticEditorSession implements PluginValue {
     if (review === undefined) return false;
     this.focusedReviewId = reviewId;
     this.syncFocusClasses();
+    this.surface.setFocus(reviewId, this.sourcePath);
     this.view.dispatch({
       effects: EditorView.scrollIntoView(review.anchor.from, {
         y: 'nearest',
@@ -98,6 +134,7 @@ export class CriticEditorSession implements PluginValue {
     if (this.focusedReviewId === null) return;
     this.focusedReviewId = null;
     this.syncFocusClasses();
+    this.surface.setFocus(null, this.sourcePath);
   }
 
   navigate(direction: NavigationDirection): boolean {
@@ -127,6 +164,16 @@ export class CriticEditorSession implements PluginValue {
     return true;
   }
 
+  private applyReviewAction(reviewId: string, action: ReviewAction): void {
+    const review = this.reviewById(reviewId);
+    if (review === undefined) return;
+    const edit = reviewEdit(review, action);
+    if (edit === null) return;
+    this.view.dispatch({
+      changes: { from: edit.from, to: edit.to, insert: edit.insert },
+    });
+  }
+
   private rebuildDecorations(): void {
     this.decorations = this.livePreview
       ? createDecorationSet(
@@ -147,6 +194,16 @@ export class CriticEditorSession implements PluginValue {
     const hasReviews = this.livePreview && this.parsed.reviews.length > 0;
     this.view.dom.classList.toggle('critic-editor', hasReviews);
     this.view.dom.classList.toggle('critic-live-preview', hasReviews);
+  }
+
+  private syncSurface(): void {
+    this.surface.reconcile(
+      this.parsed.reviews,
+      buildReviewPresentations(this.parsed.reviews),
+      this.focusedReviewId,
+      this.sourcePath,
+      this.livePreview && this.parsed.reviews.length > 0,
+    );
   }
 
   private syncFocusClasses(): void {
@@ -186,4 +243,15 @@ function arrowDirection(key: string): NavigationDirection | null {
   if (key === 'ArrowLeft') return -1;
   if (key === 'ArrowRight') return 1;
   return null;
+}
+
+function reviewEdit(review: ReviewItem, action: ReviewAction) {
+  switch (action) {
+    case 'accept':
+      return review.kind === 'suggestion' ? acceptReview(review) : null;
+    case 'reject':
+      return review.kind === 'suggestion' ? rejectReview(review) : null;
+    case 'resolve':
+      return resolveReview(review);
+  }
 }
