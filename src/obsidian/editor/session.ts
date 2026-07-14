@@ -34,7 +34,7 @@ export class CriticEditorSession implements PluginValue {
 
   constructor(
     readonly view: EditorView,
-    private readonly host: CriticEditorHost,
+    host: CriticEditorHost,
   ) {
     const snapshot = view.state.field(criticEditorStateField);
     this.parsed = snapshot.parsed;
@@ -49,7 +49,6 @@ export class CriticEditorSession implements PluginValue {
       },
       host.statusBarContainer,
     );
-    host.attachSession(this);
     this.syncSurface();
     this.syncAnnotationDom();
   }
@@ -117,7 +116,6 @@ export class CriticEditorSession implements PluginValue {
 
   destroy(): void {
     this.surface.destroy();
-    this.host.detachSession(this);
   }
 
   focusReview(reviewId: string, scrollIntoView = true): boolean {
@@ -125,7 +123,7 @@ export class CriticEditorSession implements PluginValue {
     if (review === undefined) return false;
     this.focusedReviewId = reviewId;
     this.syncAnnotationDom();
-    this.surface.setFocus(reviewId, this.sourcePath);
+    this.surface.setFocus(reviewId);
     if (scrollIntoView) {
       this.view.dispatch({
         effects: EditorView.scrollIntoView(review.anchor.from, {
@@ -141,7 +139,7 @@ export class CriticEditorSession implements PluginValue {
     if (this.focusedReviewId === null) return;
     this.focusedReviewId = null;
     this.syncAnnotationDom();
-    this.surface.setFocus(null, this.sourcePath);
+    this.surface.setFocus(null);
   }
 
   navigate(direction: NavigationDirection): boolean {

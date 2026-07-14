@@ -1,10 +1,6 @@
-import type * as obsidian from 'obsidian';
-
-import type { CriticEditorSession } from './session';
+import type { App } from 'obsidian';
 
 export interface CriticEditorHost {
-  readonly app: obsidian.App;
+  readonly app: App;
   readonly statusBarContainer: HTMLElement | null;
-  readonly attachSession: (session: CriticEditorSession) => void;
-  readonly detachSession: (session: CriticEditorSession) => void;
 }

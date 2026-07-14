@@ -3,7 +3,6 @@ import * as obsidian from 'obsidian';
 import type { ReviewProjection } from '../core/projection';
 import { createCriticEditorExtension } from './editor/extension';
 import type { CriticEditorHost } from './editor/host';
-import type { CriticEditorSession } from './editor/session';
 import { createReadingPostProcessor } from './reading/postprocessor';
 import {
   type CriticSettings,
@@ -15,7 +14,6 @@ import { CriticSettingsTab } from './settings-tab';
 const FINAL_RUNNABLE_POSTPROCESSOR_ORDER = Number.MAX_SAFE_INTEGER - 1;
 
 export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
-  private readonly sessions = new Set<CriticEditorSession>();
   private statusBarProbe: HTMLElement | null = null;
   settings: CriticSettings = DEFAULT_CRITIC_SETTINGS;
   private settingsRevision = 0;
@@ -23,6 +21,8 @@ export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
 
   override async onload(): Promise<void> {
     this.settings = normalizeCriticSettings(await this.loadData());
+    // A hidden item is the supported handle for locating Obsidian's host-owned
+    // status bar; review surfaces use its container as their bottom boundary.
     this.statusBarProbe = this.addStatusBarItem();
     this.statusBarProbe.style.display = 'none';
     this.registerEditorExtension(createCriticEditorExtension(this));
@@ -55,14 +55,6 @@ export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
 
   get statusBarContainer(): HTMLElement | null {
     return this.statusBarProbe?.parentElement ?? null;
-  }
-
-  attachSession(session: CriticEditorSession): void {
-    this.sessions.add(session);
-  }
-
-  detachSession(session: CriticEditorSession): void {
-    this.sessions.delete(session);
   }
 
   setReadingProjection(projection: ReviewProjection): Promise<void> {

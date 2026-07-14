@@ -46,6 +46,9 @@ type SurfaceMeasurement =
       readonly documentDelta: number;
     };
 
+const SCROLL_EPSILON = 0.01;
+const PIXEL_EPSILON = 0.5;
+
 export class ReviewSurfaceController {
   private readonly rail: ReviewRail;
   private readonly sheet: ReviewSheet;
@@ -54,14 +57,17 @@ export class ReviewSurfaceController {
   private reviews: readonly ReviewItem[] = [];
   private presentations: readonly ReviewPresentation[] = [];
   private focusedReviewId: string | null = null;
+  private sourcePath = '';
   private readonly lifecycle: {
     reviewing: boolean;
     destroyed: boolean;
   } = { reviewing: false, destroyed: false };
   private mode: VisibleReviewSurfaceMode = 'sheet';
   private scrollState: ReviewScrollState = createScrollState();
-  private snapshot: ExpandedSnapshot | null = null;
+  private expandedSnapshot: ExpandedSnapshot | null = null;
   private previousScrollTop: number;
+  // Scroll events may arrive between requestMeasure's read and write phases.
+  // Drain only the deltas captured by a read so later input survives that frame.
   private pendingDocumentDelta = 0;
   private pendingCollisionDelta = 0;
   private hostBottomInset = 0;
@@ -107,17 +113,17 @@ export class ReviewSurfaceController {
   ): void {
     this.reviews = reviews;
     this.presentations = presentations;
+    this.sourcePath = sourcePath;
     this.lifecycle.reviewing = reviewing;
     if (!reviewing) {
       this.pendingDocumentDelta = 0;
       this.pendingCollisionDelta = 0;
     }
     this.rail.reconcile(reviewing ? presentations : [], sourcePath);
-    this.setFocus(focusedReviewId, sourcePath);
-    this.schedule();
+    this.setFocus(focusedReviewId);
   }
 
-  setFocus(focusedReviewId: string | null, sourcePath: string): void {
+  setFocus(focusedReviewId: string | null): void {
     const focusChanged = focusedReviewId !== this.focusedReviewId;
     this.focusedReviewId = focusedReviewId;
     this.rail.setFocused(focusedReviewId);
@@ -130,7 +136,7 @@ export class ReviewSurfaceController {
         : null,
       Math.max(0, index),
       this.presentations.length,
-      sourcePath,
+      this.sourcePath,
     );
     if (focusChanged) {
       this.scrollState =
@@ -197,19 +203,19 @@ export class ReviewSurfaceController {
       this.pendingCollisionDelta -= measurement.collisionDelta;
     }
     if (measurement.mode === 'hidden') {
-      this.snapshot = null;
+      this.expandedSnapshot = null;
       this.rail.clearLayout();
       return;
     }
     if (measurement.mode === 'sheet') {
-      this.snapshot = null;
+      this.expandedSnapshot = null;
       this.rail.clearLayout();
       const delta = sheetDocumentDelta(
         measurement.surface.anchor,
         measurement.surface.viewport,
         measurement.surface.sheetHeight,
       );
-      if (Math.abs(delta) >= 0.5) this.applyDocumentDelta(delta);
+      if (Math.abs(delta) >= PIXEL_EPSILON) this.applyDocumentDelta(delta);
       return;
     }
 
@@ -217,13 +223,15 @@ export class ReviewSurfaceController {
       measurement.surface.items,
       measurement.surface.geometry,
       this.scrollState,
-      { scrollMoved: Math.abs(measurement.documentDelta) >= 0.01 },
+      {
+        scrollMoved: Math.abs(measurement.documentDelta) >= SCROLL_EPSILON,
+      },
     );
-    this.snapshot = computed;
+    this.expandedSnapshot = computed;
     this.scrollState = computed.state;
     this.rail.commit(computed.layout, measurement.surface.geometry.railHeight);
 
-    if (Math.abs(measurement.collisionDelta) < 0.01) return;
+    if (Math.abs(measurement.collisionDelta) < SCROLL_EPSILON) return;
     const progress = finishCommentLaneScroll(
       this.scrollState,
       computed,
@@ -237,7 +245,7 @@ export class ReviewSurfaceController {
     const scrollTop = this.view.scrollDOM.scrollTop;
     const delta = scrollTop - this.previousScrollTop;
     this.previousScrollTop = scrollTop;
-    if (!this.lifecycle.reviewing || Math.abs(delta) < 0.01) return;
+    if (!this.lifecycle.reviewing || Math.abs(delta) < SCROLL_EPSILON) return;
     this.pendingDocumentDelta += delta;
     this.scrollState = scrollStateForDocumentDelta(this.scrollState, delta);
     this.schedule();
@@ -255,7 +263,7 @@ export class ReviewSurfaceController {
       return;
     }
     this.mode = mode;
-    this.snapshot = null;
+    this.expandedSnapshot = null;
     // Re-evaluate the ViewPlugin-provided root attributes without changing state.
     this.view.update([]);
     this.schedule();
@@ -271,24 +279,24 @@ export class ReviewSurfaceController {
     const content = this.view.dom.getBoundingClientRect();
     const overlay = this.hostBottomOverlay?.getBoundingClientRect() ?? null;
     const inset = bottomOverlayInset(content, overlay);
-    if (Math.abs(inset - this.hostBottomInset) < 0.5) return;
+    if (Math.abs(inset - this.hostBottomInset) < PIXEL_EPSILON) return;
     this.hostBottomInset = inset;
     this.rail.setBottomInset(inset);
     this.sheet.setBottomInset(inset);
   }
 
   private readonly handleRailWheel = (event: WheelEvent): void => {
-    if (this.mode !== 'expanded' || this.snapshot === null) return;
+    if (this.mode !== 'expanded' || this.expandedSnapshot === null) return;
     const delta = normalizeWheelDelta(
       event.deltaY,
       event.deltaMode,
       this.rail.element.clientHeight,
     );
-    if (Math.abs(delta) < 0.01) return;
+    if (Math.abs(delta) < SCROLL_EPSILON) return;
     event.preventDefault();
     const transition = beginCommentLaneScroll(
       this.scrollState,
-      this.snapshot,
+      this.expandedSnapshot,
       delta,
       this.rail.element.clientHeight,
     );
@@ -301,7 +309,7 @@ export class ReviewSurfaceController {
   };
 
   private applyDocumentDelta(delta: number): void {
-    if (Math.abs(delta) < 0.01) return;
+    if (Math.abs(delta) < SCROLL_EPSILON) return;
     const before = this.view.scrollDOM.scrollTop;
     this.view.scrollDOM.scrollTop = before + delta;
     const after = this.view.scrollDOM.scrollTop;
