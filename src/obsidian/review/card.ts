@@ -114,6 +114,7 @@ export class ReviewCard {
 
   private readonly stopEditorInput = (event: Event): void => {
     event.stopPropagation();
+    if (event.type === 'mousedown') event.preventDefault();
   };
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
