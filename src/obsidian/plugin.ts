@@ -16,12 +16,15 @@ const FINAL_RUNNABLE_POSTPROCESSOR_ORDER = Number.MAX_SAFE_INTEGER - 1;
 
 export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
   private readonly sessions = new Set<CriticEditorSession>();
+  private statusBarProbe: HTMLElement | null = null;
   settings: CriticSettings = DEFAULT_CRITIC_SETTINGS;
   private settingsRevision = 0;
   private settingsSaveQueue: Promise<void> = Promise.resolve();
 
   override async onload(): Promise<void> {
     this.settings = normalizeCriticSettings(await this.loadData());
+    this.statusBarProbe = this.addStatusBarItem();
+    this.statusBarProbe.style.display = 'none';
     this.registerEditorExtension(createCriticEditorExtension(this));
     this.registerMarkdownPostProcessor(
       createReadingPostProcessor(
@@ -48,6 +51,10 @@ export class CriticPlugin extends obsidian.Plugin implements CriticEditorHost {
         }
       },
     });
+  }
+
+  get statusBarContainer(): HTMLElement | null {
+    return this.statusBarProbe?.parentElement ?? null;
   }
 
   attachSession(session: CriticEditorSession): void {

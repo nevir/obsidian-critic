@@ -348,12 +348,16 @@
 }
 
 .critic-review-sheet {
+  --critic-host-bottom-inset: 0px;
   position: absolute;
   z-index: 30;
   right: 8px;
-  bottom: max(8px, env(safe-area-inset-bottom));
+  bottom: calc(
+    max(8px, env(safe-area-inset-bottom)) +
+    var(--critic-host-bottom-inset)
+  );
   left: 8px;
-  max-height: min(62dvh, calc(100% - 24px));
+  max-height: min(62dvh, calc(100% - 24px - var(--critic-host-bottom-inset)));
 }
 
 .critic-sheet-mode .critic-review-sheet.critic-open {
@@ -367,7 +371,7 @@
   right: auto;
   left: auto;
   display: flex;
-  max-height: min(62dvh, calc(100% - 24px));
+  max-height: min(62dvh, calc(100% - 24px - var(--critic-host-bottom-inset)));
   flex-direction: column;
   transform: none;
 }

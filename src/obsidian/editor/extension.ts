@@ -10,8 +10,8 @@ const criticEditorPlugin = ViewPlugin.fromClass<
   CriticEditorHost
 >(CriticEditorSession, {
   eventHandlers: {
-    click(event) {
-      this.handleClick(event);
+    mousedown(event) {
+      this.handleMouseDown(event);
       return false;
     },
     keydown(event) {

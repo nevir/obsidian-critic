@@ -65,6 +65,10 @@ export class ReviewRail {
     }
   }
 
+  setBottomInset(inset: number): void {
+    this.element.style.bottom = `${inset}px`;
+  }
+
   commit(layout: ExpandedLayout, railHeight: number): void {
     const visibleIds = new Set<string>();
     for (const item of layout.items) {
@@ -72,7 +76,8 @@ export class ReviewRail {
       if (card === undefined) continue;
       visibleIds.add(item.id);
       const element = card.element;
-      element.style.transform = `translateY(${item.top}px)`;
+      element.style.top = `${item.top}px`;
+      element.style.removeProperty('transform');
       const cardNear =
         item.top + item.height >= -80 && item.top <= railHeight + 80;
       const anchorNear =
@@ -100,6 +105,7 @@ export class ReviewRail {
   clearLayout(): void {
     for (const card of this.cards.values()) {
       card.setVisible(true);
+      card.element.style.removeProperty('top');
       card.element.style.removeProperty('transform');
       card.element.classList.remove(
         'critic-offscreen',

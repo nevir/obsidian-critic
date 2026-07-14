@@ -6,6 +6,30 @@ export interface VisibleRect {
   readonly bottom: number;
 }
 
+export interface VisibleBounds extends VisibleRect {
+  readonly left: number;
+  readonly right: number;
+}
+
+export function bottomOverlayInset(
+  content: VisibleBounds,
+  overlay: VisibleBounds | null,
+): number {
+  if (
+    overlay === null ||
+    overlay.right <= content.left ||
+    overlay.left >= content.right ||
+    overlay.bottom <= content.top ||
+    overlay.top >= content.bottom
+  ) {
+    return 0;
+  }
+  return Math.min(
+    content.bottom - content.top,
+    Math.max(0, content.bottom - overlay.top),
+  );
+}
+
 export function chooseVisibleSurfaceMode(
   editorWidth: number,
 ): VisibleReviewSurfaceMode {

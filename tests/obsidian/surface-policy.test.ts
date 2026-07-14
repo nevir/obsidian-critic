@@ -2,10 +2,34 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  bottomOverlayInset,
   chooseVisibleSurfaceMode,
   normalizeWheelDelta,
   sheetDocumentDelta,
 } from '../../src/obsidian/review/surface-policy.ts';
+
+test('reserves only a host overlay that intersects the editor bottom edge', () => {
+  const editor = { top: 100, bottom: 900, left: 200, right: 1200 };
+  assert.equal(
+    bottomOverlayInset(editor, {
+      top: 873,
+      bottom: 900,
+      left: 1000,
+      right: 1200,
+    }),
+    27,
+  );
+  assert.equal(
+    bottomOverlayInset(editor, {
+      top: 873,
+      bottom: 900,
+      left: 1200,
+      right: 1400,
+    }),
+    0,
+  );
+  assert.equal(bottomOverlayInset(editor, null), 0);
+});
 
 test('chooses one responsive surface from stable editor width', () => {
   assert.equal(chooseVisibleSurfaceMode(899), 'sheet');

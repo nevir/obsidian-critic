@@ -24,6 +24,7 @@ import type { ReviewPresentation } from './presentation';
 import { ReviewRail } from './rail';
 import { ReviewSheet } from './sheet';
 import {
+  bottomOverlayInset,
   chooseVisibleSurfaceMode,
   normalizeWheelDelta,
   type ReviewSurfaceMode,
@@ -49,6 +50,7 @@ export class ReviewSurfaceController {
   private readonly rail: ReviewRail;
   private readonly sheet: ReviewSheet;
   private readonly editorResizeObserver: ResizeObserver;
+  private readonly hostOverlayResizeObserver: ResizeObserver | null;
   private reviews: readonly ReviewItem[] = [];
   private presentations: readonly ReviewPresentation[] = [];
   private focusedReviewId: string | null = null;
@@ -62,17 +64,28 @@ export class ReviewSurfaceController {
   private previousScrollTop: number;
   private pendingDocumentDelta = 0;
   private pendingCollisionDelta = 0;
+  private hostBottomInset = 0;
 
   constructor(
     private readonly view: EditorView,
     app: App,
     callbacks: ReviewCardCallbacks,
+    private readonly hostBottomOverlay: HTMLElement | null,
   ) {
     this.rail = new ReviewRail(view.dom, app, callbacks, this.schedule);
     this.sheet = new ReviewSheet(view.dom, app, callbacks, this.schedule);
     this.previousScrollTop = view.scrollDOM.scrollTop;
     this.editorResizeObserver = new ResizeObserver(this.handleEditorResize);
     this.editorResizeObserver.observe(view.dom);
+    if (hostBottomOverlay === null) {
+      this.hostOverlayResizeObserver = null;
+    } else {
+      this.hostOverlayResizeObserver = new ResizeObserver(
+        this.handleHostOverlayResize,
+      );
+      this.hostOverlayResizeObserver.observe(hostBottomOverlay);
+    }
+    this.syncHostBottomInset();
     view.scrollDOM.addEventListener('scroll', this.handleDocumentScroll, {
       passive: true,
     });
@@ -140,6 +153,7 @@ export class ReviewSurfaceController {
   destroy(): void {
     this.lifecycle.destroyed = true;
     this.editorResizeObserver.disconnect();
+    this.hostOverlayResizeObserver?.disconnect();
     this.view.scrollDOM.removeEventListener(
       'scroll',
       this.handleDocumentScroll,
@@ -234,6 +248,7 @@ export class ReviewSurfaceController {
   ): void => {
     const entry = entries[entries.length - 1];
     if (entry === undefined || this.lifecycle.destroyed) return;
+    this.syncHostBottomInset();
     const mode = chooseVisibleSurfaceMode(entry.contentRect.width);
     if (mode === this.mode) {
       this.schedule();
@@ -245,6 +260,22 @@ export class ReviewSurfaceController {
     this.view.update([]);
     this.schedule();
   };
+
+  private readonly handleHostOverlayResize = (): void => {
+    if (this.lifecycle.destroyed) return;
+    this.syncHostBottomInset();
+    this.schedule();
+  };
+
+  private syncHostBottomInset(): void {
+    const content = this.view.dom.getBoundingClientRect();
+    const overlay = this.hostBottomOverlay?.getBoundingClientRect() ?? null;
+    const inset = bottomOverlayInset(content, overlay);
+    if (Math.abs(inset - this.hostBottomInset) < 0.5) return;
+    this.hostBottomInset = inset;
+    this.rail.setBottomInset(inset);
+    this.sheet.setBottomInset(inset);
+  }
 
   private readonly handleRailWheel = (event: WheelEvent): void => {
     if (this.mode !== 'expanded' || this.snapshot === null) return;

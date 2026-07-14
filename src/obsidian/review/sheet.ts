@@ -52,6 +52,10 @@ export class ReviewSheet {
     this.element.classList.add('critic-open');
   }
 
+  setBottomInset(inset: number): void {
+    this.element.style.setProperty('--critic-host-bottom-inset', `${inset}px`);
+  }
+
   clear(): void {
     this.element.classList.remove('critic-open');
     this.card?.destroy();

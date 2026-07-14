@@ -38,11 +38,16 @@ export class CriticEditorSession implements PluginValue {
     const snapshot = view.state.field(criticEditorStateField);
     this.parsed = snapshot.parsed;
     this.livePreview = snapshot.livePreview;
-    this.surface = new ReviewSurfaceController(view, host.app, {
-      focus: reviewId => this.focusReview(reviewId),
-      clearFocus: () => this.clearFocus(),
-      act: (reviewId, action) => this.applyReviewAction(reviewId, action),
-    });
+    this.surface = new ReviewSurfaceController(
+      view,
+      host.app,
+      {
+        focus: reviewId => this.focusReview(reviewId),
+        clearFocus: () => this.clearFocus(),
+        act: (reviewId, action) => this.applyReviewAction(reviewId, action),
+      },
+      host.statusBarContainer,
+    );
     host.attachSession(this);
     this.syncSurface();
   }
@@ -141,7 +146,7 @@ export class CriticEditorSession implements PluginValue {
     return reviewId === null ? false : this.focusReview(reviewId);
   }
 
-  handleClick(event: MouseEvent): void {
+  handleMouseDown(event: MouseEvent): void {
     const target = reviewTargetFromEvent(event);
     if (target === null) {
       this.clearFocus();
