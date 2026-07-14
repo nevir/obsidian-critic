@@ -1,0 +1,189 @@
+import {
+  Decoration,
+  type DecorationSet,
+  EditorView,
+  type PluginValue,
+  type ViewUpdate,
+} from '@codemirror/view';
+import { editorInfoField, editorLivePreviewField } from 'obsidian';
+
+import type { ParsedDocument, ReviewItem, SourceRange } from '../../core/model';
+import { parseCriticMarkup } from '../../core/syntax/index';
+import {
+  adjacentReviewId,
+  type NavigationDirection,
+  reconcileFocusedReviewId,
+} from '../review/navigation';
+import { buildDecorationSpecs } from './decoration-specs';
+import { createDecorationSet } from './decorations';
+import type { CriticEditorHost } from './host';
+
+export class CriticEditorSession implements PluginValue {
+  decorations: DecorationSet = Decoration.none;
+  private parsed: ParsedDocument;
+  private livePreview: boolean;
+  private focusedReviewId: string | null = null;
+
+  constructor(
+    readonly view: EditorView,
+    private readonly host: CriticEditorHost,
+  ) {
+    this.parsed = parseCriticMarkup(view.state.doc.sliceString(0));
+    this.livePreview = readLivePreview(view);
+    this.rebuildDecorations();
+    this.syncEditorClass();
+    host.attachSession(this);
+  }
+
+  get sourcePath(): string {
+    return this.view.state.field(editorInfoField, false)?.file?.path ?? '';
+  }
+
+  get focusedId(): string | null {
+    return this.focusedReviewId;
+  }
+
+  get reviews(): readonly ReviewItem[] {
+    return this.parsed.reviews;
+  }
+
+  update(update: ViewUpdate): void {
+    const nextLivePreview = readLivePreview(this.view);
+    const modeChanged = nextLivePreview !== this.livePreview;
+    this.livePreview = nextLivePreview;
+
+    if (update.docChanged) {
+      const previousIds = this.reviewIds();
+      this.parsed = parseCriticMarkup(update.state.doc.sliceString(0));
+      this.focusedReviewId = reconcileFocusedReviewId(
+        previousIds,
+        this.reviewIds(),
+        this.focusedReviewId,
+      );
+    }
+
+    if (update.docChanged || update.selectionSet || modeChanged) {
+      this.rebuildDecorations();
+    }
+    if (update.docChanged || update.viewportChanged || modeChanged) {
+      this.syncEditorClass();
+      this.syncFocusClasses();
+    }
+  }
+
+  docViewUpdate(): void {
+    this.syncFocusClasses();
+  }
+
+  destroy(): void {
+    this.host.detachSession(this);
+    this.view.dom.classList.remove('critic-editor', 'critic-live-preview');
+  }
+
+  focusReview(reviewId: string): boolean {
+    const review = this.reviewById(reviewId);
+    if (review === undefined) return false;
+    this.focusedReviewId = reviewId;
+    this.syncFocusClasses();
+    this.view.dispatch({
+      effects: EditorView.scrollIntoView(review.anchor.from, {
+        y: 'nearest',
+        yMargin: Math.min(48, this.view.scrollDOM.clientHeight / 4),
+      }),
+    });
+    return true;
+  }
+
+  clearFocus(): void {
+    if (this.focusedReviewId === null) return;
+    this.focusedReviewId = null;
+    this.syncFocusClasses();
+  }
+
+  navigate(direction: NavigationDirection): boolean {
+    const reviewId = adjacentReviewId(
+      this.reviewIds(),
+      this.focusedReviewId,
+      direction,
+    );
+    return reviewId === null ? false : this.focusReview(reviewId);
+  }
+
+  handleClick(event: MouseEvent): void {
+    const reviewId = reviewIdFromEvent(event);
+    if (reviewId === null) {
+      this.clearFocus();
+      return;
+    }
+    this.focusReview(reviewId);
+  }
+
+  handleKeydown(event: KeyboardEvent): boolean {
+    if (this.focusedReviewId === null) return false;
+    const direction = arrowDirection(event.key);
+    if (direction === null) return false;
+    this.navigate(direction);
+    event.preventDefault();
+    return true;
+  }
+
+  private rebuildDecorations(): void {
+    this.decorations = this.livePreview
+      ? createDecorationSet(
+          buildDecorationSpecs(this.parsed, selectionRanges(this.view)),
+        )
+      : Decoration.none;
+  }
+
+  private reviewById(reviewId: string): ReviewItem | undefined {
+    return this.parsed.reviews.find(review => review.id === reviewId);
+  }
+
+  private reviewIds(): string[] {
+    return this.parsed.reviews.map(review => review.id);
+  }
+
+  private syncEditorClass(): void {
+    const hasReviews = this.livePreview && this.parsed.reviews.length > 0;
+    this.view.dom.classList.toggle('critic-editor', hasReviews);
+    this.view.dom.classList.toggle('critic-live-preview', hasReviews);
+  }
+
+  private syncFocusClasses(): void {
+    const focusedId = this.focusedReviewId;
+    for (const element of this.view.dom.querySelectorAll<HTMLElement>(
+      '[data-critic-review-id]',
+    )) {
+      element.classList.toggle(
+        'critic-focused',
+        element.dataset['criticReviewId'] === focusedId,
+      );
+    }
+  }
+}
+
+function readLivePreview(view: EditorView): boolean {
+  return view.state.field(editorLivePreviewField, false) ?? false;
+}
+
+function selectionRanges(view: EditorView): SourceRange[] {
+  return view.state.selection.ranges.map(range => ({
+    from: range.from,
+    to: range.to,
+  }));
+}
+
+function reviewIdFromEvent(event: MouseEvent): string | null {
+  if (!(event.target instanceof Element)) return null;
+  return (
+    event.target.closest<HTMLElement>('[data-critic-review-id]')?.dataset[
+      'criticReviewId'
+    ] ?? null
+  );
+}
+
+function arrowDirection(key: string): NavigationDirection | null {
+  if (key === 'ArrowLeft') return -1;
+  if (key === 'ArrowRight') return 1;
+  return null;
+}
