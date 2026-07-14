@@ -1,130 +1,106 @@
-# Developing with this template
+# Contributing to Critic
 
-This guide covers local setup, repository structure, and the rules that keep
-the template consistent.
+Critic is deliberately split into a portable review engine and a thin Obsidian
+adapter. Preserve that boundary: review semantics should remain easy to test,
+reason about, and eventually port to another host.
 
-## Set up a plugin
+## Set up the repository
 
-1. Set the plugin ID, name, description, author, and compatibility in
-   `manifest.json`. The plugin ID must match its folder name.
-2. Set the package name in `package.json`. Keep its version equal to the
-   manifest version, and map that version to `minAppVersion` in `versions.json`.
-3. Put the repository in a dedicated test vault at
-   `.obsidian/plugins/<plugin-id>`.
-4. Install [mise](https://mise.jdx.dev/), then run:
+Install [mise](https://mise.jdx.dev/), then run:
 
-   ```sh
-   mise install
-   mise run install
-   mise run dev
-   ```
+```sh
+mise install
+mise run install
+mise run test
+```
 
-5. Reload Obsidian and enable the plugin under
-   **Settings → Community plugins**.
+For interactive development, place or symlink the repository at
+`.obsidian/plugins/critic` in a dedicated test vault, run `mise run dev`, then
+reload Obsidian and enable **Critic** under **Settings → Community plugins**.
+The watch task rebuilds `main.js` as source files change.
 
-Add plugin behavior in `src/Plugin.ts`. The existing `Settings.ts` and
-`SettingsTab.ts` show how to type, load, update, and save plugin settings.
+## Understand the architecture
 
-## Use mise tasks
+- `src/core/syntax/` parses CriticMarkup into source ranges and review groups.
+- `src/core/layout/` solves review-card positions and coupled scrolling from
+  plain measurements. It must not depend on the DOM, browser events, Obsidian,
+  or CodeMirror.
+- `src/core/mutations.ts` creates atomic accept, reject, and resolve edits.
+- `src/core/projection.ts` produces original and proposed Reading View source.
+- `src/obsidian/editor/` owns the CodeMirror extension and Live Preview
+  decorations.
+- `src/obsidian/review/` measures the host, renders cards, and adapts input to
+  the portable layout engine.
+- `src/obsidian/reading/` applies whole-document projection through Obsidian's
+  Markdown postprocessor lifecycle.
+- `tests/core/` specifies portable behavior; `tests/obsidian/` covers adapter
+  logic that can be exercised without launching the app.
 
-Treat mise as the main interface to the repository:
+Keep source edits as plain, range-based data until the Obsidian boundary. Keep
+DOM reads and writes in CodeMirror `requestMeasure` phases. Use supported
+Obsidian APIs; do not reach into private editor internals to recover rendered
+widget structure.
 
-- `mise run dev` watches the source and rebuilds `main.js`.
-- `mise run check` runs lint, typecheck, and build.
-- `mise run lint` checks formatting, lint rules, workflows, and config coverage.
-- `mise run typecheck` checks TypeScript without emitting files.
-- `mise run versioncheck` checks deferred version intent and manifest versions.
-- `mise run build` creates and smoke-tests the production bundle.
-- `mise run fix` applies safe Biome fixes.
+## Make a change
 
-The `build`, `dev`, `fix`, and `test` Yarn scripts are thin aliases for editor
-and package-manager integrations; `test` runs `mise run check`. CI shows lint,
-typecheck, build, and pull-request version checks separately.
+For a bug, first add the smallest regression test that demonstrates the broken
+contract. Favor observable behavior over implementation details. Layout work
+should include edge, collision, oversized-card, focus, and continuity cases as
+appropriate; one-pixel and randomized property tests protect the solver from
+discontinuous motion.
 
-## Know the repository structure
+Keep modules focused and names literal. Extract an abstraction when it removes
+a real duplicate concept or clarifies ownership, not in anticipation of future
+features. Comments should explain intent, host constraints, or invariants that
+the code cannot make obvious.
 
-- `src/` contains plugin code shared by desktop and mobile.
-- `manifest.json` and `versions.json` describe Obsidian compatibility.
-- `biome.jsonc` and `tsconfig.json` are small entry points into `.toolchain/`.
-- `.toolchain/biome/` contains formatting and lint policy.
-- `.toolchain/typescript/` contains compiler policy.
-- `.toolchain/check-explicit-config.mjs` detects new Biome rules and TypeScript
-  type-checking options.
-- `.toolchain/check-bundle.mjs` checks the production bundle's exports, source
-  maps, and mobile initialization.
-- `.toolchain/sync-version.mjs` keeps package and Obsidian versions aligned.
-- `.mise.toml` defines tasks and tools; `mise.lock` pins their versions.
-- `main.js` is generated output. Change the TypeScript source instead.
+Run the focused test while iterating, then the complete gate before committing:
 
-## Keep configuration explicit
+```sh
+mise run test
+mise run check
+```
 
-Keep `biome.jsonc` and `tsconfig.json` as small entry points into `.toolchain/`;
-put their reusable policy there rather than growing the root files.
+The useful tasks are:
 
-Every Biome rule belongs in
-`.toolchain/biome/rules/<language>/<category>.jsonc`. Give it an explicit
-severity and a comment explaining the decision. Rules shared by several
-languages live under `rules/shared/`.
+- `mise run dev` watches and rebuilds the development bundle.
+- `mise run test` type-checks and runs host-independent tests.
+- `mise run lint` checks formatting, lint rules, workflows, and explicit config.
+- `mise run typecheck` checks the plugin without emitting files.
+- `mise run build` creates and smoke-tests the production bundle on simulated
+  iOS and Android runtimes.
+- `mise run check` runs every required validation except release-version intent.
+- `mise run fix` applies safe Biome formatting and lint fixes.
 
-Every TypeScript option in the compiler's **Type Checking** section must be
-explicit in `.toolchain/typescript/base.jsonc`, with a short reason. Run
-`mise run check` after upgrading Biome or TypeScript; the coverage check lists
-new decisions that need to be made.
+`main.js` is generated output. Change TypeScript source, then rebuild it. Bundle
+initialization tests do not replace interactive checks in Obsidian; changes to
+decorations, focus, scrolling, Reading View, or mobile presentation should be
+exercised in the real app before release.
 
-## Preserve mobile support
+## Preserve the toolchain contract
 
-`isDesktopOnly` is `false`. Code and runtime dependencies must therefore load
-without Node.js or Electron. Prefer Obsidian's `Vault`, `Platform`, and
-`requestUrl` APIs.
+The root Biome and TypeScript configs delegate to explicit policy under
+`.toolchain/`. Every Biome rule and every TypeScript type-checking option has a
+documented decision. After upgrading either tool, run `mise run check` and
+resolve newly reported policy choices rather than enabling a broad preset.
 
-Desktop-only enhancements are allowed when they are guarded by
-`Platform.isDesktopApp` and their modules are resolved only at runtime. Parcel
-can hoist a direct import or literal `require('node:fs')`, even from inside that
-guard. The bundle check rejects those startup-time loads.
+Critic supports desktop and mobile. Runtime code must load without Node.js or
+Electron; prefer Obsidian's cross-platform APIs. The production bundle check
+rejects source maps and startup-time platform dependencies.
 
-The bundle check simulates module initialization on iOS and Android; it does not
-replace testing real plugin behavior on both platforms.
+Use the Yarn version installed by mise and commit `yarn.lock` when dependencies
+change. Install scripts remain disabled unless a package is explicitly allowed
+under `dependenciesMeta`.
 
-## Change dependencies carefully
+## Prepare a release change
 
-Use the Yarn version installed by mise and commit the resulting `yarn.lock`.
-Third-party install scripts are disabled unless a package is explicitly allowed
-under `dependenciesMeta` in `package.json`.
-
-`.yarnrc.yml` contains exact-version repairs for two Parcel dependency metadata
-issues. Keep them narrow so unrelated peer warnings remain visible. Revisit or
-remove them when Parcel is upgraded.
-
-## Release a plugin
-
-Every pull request must declare the release it should produce:
+Every pull request declares the release it should produce:
 
 ```sh
 yarn version patch --deferred
 ```
 
-Use `minor` or `major` instead of `patch` when appropriate. Commit the generated
-file under `.yarn/versions/`. `preferDeferredVersions` is also enabled as a
-safety net, and the Version CI check runs `yarn version check` with full Git
-history. The project check rejects `decline` and any strategy other than
-`patch`, `minor`, or `major`.
-
-After the pull request merges, `.github/workflows/release.yml`:
-
-1. Applies all deferred versions with `yarn version apply --all`.
-2. Updates `manifest.json` and `versions.json` from `package.json`.
-3. Runs the full validation suite.
-4. Commits the applied version to `main`.
-5. Creates the matching tag and dispatches the publication workflow from that
-   exact tag.
-
-`.github/workflows/publish-release.yml` rebuilds from the tagged commit, attests
-the bundle, and publishes a GitHub release containing `main.js`,
-`manifest.json`, and `styles.css` when present.
-
-The workflow uses the repository's `GITHUB_TOKEN`. Give GitHub Actions read and
-write repository permission so it can push the version commit and tag.
-If `main` is protected, its ruleset must also allow this workflow to push the
-generated release commit. Pushes made with `GITHUB_TOKEN` do not trigger another
-push workflow. Publication is dispatched explicitly at the tag, so the release
-workflow cannot loop and provenance points to the released commit.
+Use `minor` or `major` when appropriate and commit the generated file under
+`.yarn/versions/`. CI validates the deferred version, manifests, lint, tests,
+typecheck, and production bundle. Merging applies the version, tags the exact
+commit, and publishes `main.js`, `manifest.json`, and `styles.css`.

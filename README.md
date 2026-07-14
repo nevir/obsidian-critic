@@ -1,52 +1,50 @@
-# Obsidian Plugin Template
+# Critic for Obsidian
 
-An opinionated TypeScript starter for Obsidian plugins that run on desktop,
-iOS, and Android. It uses the ES2021 baseline from Obsidian's official sample
-and requires Obsidian 1.12.7 or newer.
+Critic turns [CriticMarkup](https://github.com/CriticMarkup/CriticMarkup-toolkit)
+in Markdown notes into an inline review experience for Obsidian. The review
+state stays in the note itself: another editor can read or change the same
+plain-text markup without this plugin.
 
-## What this template gives you
+## What works today
 
-- **A repeatable toolchain.** [mise](https://mise.jdx.dev/) installs the locked
-  Node, Yarn, and actionlint versions on macOS, Linux, and Windows.
-- **Clear, upgrade-aware rules.** Every Biome rule and every TypeScript
-  type-checking option has an explicit choice and a short reason. Biome and
-  TypeScript upgrades fail until new options have been reviewed.
-- **Mobile support by default.** Source code cannot import Node.js built-ins,
-  and the production bundle must initialize in simulated iOS and Android
-  environments.
-- **Useful pull-request checks.** Lint, typecheck, and build appear as separate
-  GitHub checks while sharing one workflow and cache setup.
-- **Safer dependency installs.** CI uses an immutable Yarn lockfile. Dependency
-  scripts are disabled by default, and newly published packages have a one-day
-  age gate.
-- **A small typed starting point.** The sample code includes saved settings and
-  a settings tab without carrying a large feature demo into a new plugin.
-- **Reviewable, automatic releases.** Each pull request declares its semantic
-  version change. Merging applies that change, tags the result, attests the
-  bundle, and publishes a GitHub release.
+- Live Preview hides CriticMarkup delimiters and renders additions, deletions,
+  substitutions, highlights, and comments in place.
+- A review rail on wide panes, and a focused sheet on narrow panes, presents
+  comment threads and accept, reject, or resolve actions.
+- Clicking an annotation or card focuses the complete review. Arrow keys move
+  between reviews while one is focused.
+- Comments support Markdown, adjacent-message threads, and optional `[Name]`
+  author prefixes. When any message has an author, unlabeled messages are shown
+  as `You`.
+- Reading View globally projects either the original or proposed document. The
+  choice is persisted across notes and restarts.
+- Source mode continues to show and edit the literal CriticMarkup.
 
-## Compared with the official template
+Critic uses the standard CriticMarkup forms:
 
-The [official Obsidian sample
-plugin](https://github.com/obsidianmd/obsidian-sample-plugin) is the best small
-example of the plugin API. It uses npm, esbuild, TypeScript, Obsidian-specific
-ESLint rules, and a tag-driven draft release workflow.
+```markdown
+{++addition++}
+{--deletion--}
+{~~before~>after~~}
+{==highlight==}{>>[Sam] Comment on the highlight.<<}
+{>>A point comment.<<}{>>[Sam] An adjacent reply.<<}
+```
 
-This template adds tighter tool version control, stricter explicit
-configuration, hardened installs, independent CI results, a mobile startup
-check, and merge-driven releases using Yarn's deferred versioning. The tradeoff
-is more tooling and more work when those tools add rules or options.
+Backslash escapes and the `[Name]` comment prefix are Critic extensions. The
+source parser, mutations, projections, and review-layout solver live in a
+host-independent core so their behavior is testable without Obsidian or a
+browser.
 
-The official sample remains a better fit if you want the simplest supported
-setup, its richer API examples, Obsidian-specific ESLint rules, or its automated
-draft-release flow. Obsidian-specific ESLint rules are not currently included
-here.
+## Current boundaries
 
-## Use the template
+- This milestone reviews existing markup. Suggestion-mode authoring and
+  selection-to-comment workflows are not implemented yet.
+- Live Preview relies only on supported Obsidian and CodeMirror APIs. Obsidian
+  owns some embedded editor widgets, so exact inline transformation inside
+  constructs such as rendered tables, callouts, and images is intentionally
+  limited.
+- Critic does not add collaboration or synchronization. Obsidian Sync, Git, or
+  another file-sync workflow remains responsible for merging Markdown.
 
-Create a repository from this template, replace its plugin metadata, and follow
-[CONTRIBUTING.md](CONTRIBUTING.md) to set up the toolchain and start developing.
-
-The root Biome and TypeScript configs are intentionally small. Their reusable
-policy lives under `.toolchain/` so it can eventually move into a shared
-package.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the architecture, development
+workflow, and validation expectations.
