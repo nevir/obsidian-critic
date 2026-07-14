@@ -22,6 +22,14 @@ test('maps plain descriptions to sorted CodeMirror decorations', () => {
       reviewId: 'change',
     },
     { kind: 'separator', from: 8, to: 10 },
+    {
+      kind: 'syntax',
+      from: 14,
+      to: 16,
+      reviewId: 'expanded',
+      text: '==',
+      placement: 'after',
+    },
   ]);
   const ranges: Array<{
     readonly from: number;
@@ -39,6 +47,8 @@ test('maps plain descriptions to sorted CodeMirror decorations', () => {
       { from: 3, to: 7 },
       { from: 8, to: 10 },
       { from: 12, to: 12 },
+      { from: 14, to: 16 },
+      { from: 16, to: 16 },
     ],
   );
   const change = ranges[1];
@@ -48,4 +58,10 @@ test('maps plain descriptions to sorted CodeMirror decorations', () => {
     'change',
   );
   assert.match(change.decoration.spec.class, /critic-annotation-addition/u);
+
+  for (const index of [3, 5]) {
+    const widget = ranges[index]?.decoration.spec.widget;
+    assert.ok(widget);
+    assert.equal(widget.ignoreEvent(new Event('mousedown')), false);
+  }
 });

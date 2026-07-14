@@ -70,6 +70,29 @@ test('keeps selected CriticMarkup source directly editable as one expression', (
     annotationClass: 'expanded',
     reviewId: review.id,
   });
+  const mark = review.mark;
+  assert.ok(mark?.kind === 'substitution');
+  assert.deepEqual(
+    selected.filter(spec => spec.kind === 'syntax'),
+    [
+      {
+        kind: 'syntax',
+        from: mark.opener.to - 2,
+        to: mark.opener.to,
+        reviewId: review.id,
+        text: '~~',
+        placement: 'after',
+      },
+      {
+        kind: 'syntax',
+        from: mark.closer.from,
+        to: mark.closer.from + 2,
+        reviewId: review.id,
+        text: '~~',
+        placement: 'before',
+      },
+    ],
+  );
   assert.equal(
     selected.some(spec => spec.kind === 'replace'),
     false,
@@ -78,6 +101,58 @@ test('keeps selected CriticMarkup source directly editable as one expression', (
     selected.some(spec => spec.kind === 'separator'),
     false,
   );
+});
+
+test('yields stable syntax pairs when the selection enters them', () => {
+  const source = '{==highlight==}{>>note<<} {~~old~>new~~}';
+  const document = parseCriticMarkup(source);
+  const highlight = document.reviews[0];
+  const substitution = document.reviews[1];
+  assert.ok(highlight?.mark?.kind === 'highlight');
+  assert.ok(substitution?.mark?.kind === 'substitution');
+
+  const highlightSpecs = buildDecorationSpecs(document, [
+    { from: highlight.mark.opener.to - 1, to: highlight.mark.opener.to - 1 },
+  ]);
+  assert.deepEqual(
+    highlightSpecs.filter(spec => spec.kind === 'syntax'),
+    [
+      {
+        kind: 'syntax',
+        from: highlight.mark.closer.from,
+        to: highlight.mark.closer.from + 2,
+        reviewId: highlight.id,
+        text: '==',
+        placement: 'before',
+      },
+    ],
+  );
+
+  const substitutionSpecs = buildDecorationSpecs(document, [
+    {
+      from: substitution.mark.originalRange.from,
+      to: substitution.mark.originalRange.from,
+    },
+  ]);
+  assert.equal(
+    substitutionSpecs.filter(spec => spec.kind === 'syntax').length,
+    2,
+  );
+});
+
+test('does not stabilize syntax without Markdown-reserved delimiter pairs', () => {
+  const source = '{++add++} {--delete--} {>>comment<<}';
+  const document = parseCriticMarkup(source);
+
+  for (const review of document.reviews) {
+    const specs = buildDecorationSpecs(document, [
+      { from: review.source.from + 1, to: review.source.from + 1 },
+    ]);
+    assert.equal(
+      specs.some(spec => spec.kind === 'syntax'),
+      false,
+    );
+  }
 });
 
 test('keeps an expanded point discussion anchored to its full source', () => {

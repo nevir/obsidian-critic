@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { EditorState } from '@codemirror/state';
-import { type Decoration, EditorView } from '@codemirror/view';
+import {
+  type Decoration,
+  type DecorationSet,
+  EditorView,
+} from '@codemirror/view';
 
 import { createCriticEditorStateField } from '../../src/obsidian/editor/state-field.ts';
 
@@ -48,9 +52,18 @@ test('recomputes direct decorations for selections and document changes', () => 
   }).state;
 
   assert.equal(
-    selected.field(criticEditorStateField).decorations.size <
-      state.field(criticEditorStateField).decorations.size,
+    hasDecorationClass(
+      selected.field(criticEditorStateField).decorations,
+      'critic-annotation-expanded',
+    ),
     true,
+  );
+  assert.equal(
+    hasDecorationClass(
+      state.field(criticEditorStateField).decorations,
+      'critic-annotation-expanded',
+    ),
+    false,
   );
   assert.equal(
     edited.field(criticEditorStateField).parsed.source,
@@ -90,4 +103,12 @@ function livePreviewState(source: string): EditorState {
     selection: { anchor: 0 },
     extensions: [criticEditorStateField],
   });
+}
+
+function hasDecorationClass(decorations: DecorationSet, className: string) {
+  let found = false;
+  decorations.between(0, Number.POSITIVE_INFINITY, (_from, _to, decoration) => {
+    if (decoration.spec.class?.includes(className)) found = true;
+  });
+  return found;
 }

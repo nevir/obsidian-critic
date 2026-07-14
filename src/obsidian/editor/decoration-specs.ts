@@ -32,6 +32,14 @@ export type DecorationSpec =
       readonly to: number;
     }
   | {
+      readonly kind: 'syntax';
+      readonly from: number;
+      readonly to: number;
+      readonly reviewId: string;
+      readonly text: '==' | '~~';
+      readonly placement: 'before' | 'after';
+    }
+  | {
       readonly kind: 'widget';
       readonly at: number;
       readonly reviewId: string;
@@ -44,7 +52,7 @@ export function buildDecorationSpecs(
 ): DecorationSpec[] {
   return document.reviews.flatMap(review =>
     reviewIsSelected(review, selections)
-      ? selectedReviewSpecs(review)
+      ? selectedReviewSpecs(review, selections)
       : compactReviewSpecs(review),
   );
 }
@@ -75,11 +83,41 @@ function compactReviewSpecs(review: ReviewItem): DecorationSpec[] {
   return specs;
 }
 
-function selectedReviewSpecs(review: ReviewItem): DecorationSpec[] {
+function selectedReviewSpecs(
+  review: ReviewItem,
+  selections: readonly SourceRange[],
+): DecorationSpec[] {
   return [
     visibleRange(review.id, review.source, 'expanded'),
+    ...stableSourceSyntax(review, selections),
     ...(review.mark === null ? [] : visibleRanges(review.id, review.mark)),
   ];
+}
+
+function stableSourceSyntax(
+  review: ReviewItem,
+  selections: readonly SourceRange[],
+): DecorationSpec[] {
+  const mark = review.mark;
+  if (mark?.kind !== 'highlight' && mark?.kind !== 'substitution') return [];
+  const text = mark.kind === 'highlight' ? '==' : '~~';
+  const ranges = [
+    {
+      from: mark.opener.to - text.length,
+      to: mark.opener.to,
+      placement: 'after' as const,
+    },
+    {
+      from: mark.closer.from,
+      to: mark.closer.from + text.length,
+      placement: 'before' as const,
+    },
+  ];
+  return ranges.flatMap(range =>
+    selections.some(selection => rangesIntersect(selection, range))
+      ? []
+      : [{ kind: 'syntax' as const, ...range, reviewId: review.id, text }],
+  );
 }
 
 function anchorSpecs(reviewId: string, mark: AnchorMark): DecorationSpec[] {
