@@ -88,22 +88,22 @@
 .critic-inline-anchor {
   display: inline-grid;
   place-items: center;
-  width: 14px;
-  height: 14px;
-  margin: 0 2px;
+  width: 18px;
+  height: 18px;
+  margin: 0 3px;
   padding: 0;
   border: 2px solid var(--background-primary);
   border-radius: 50%;
   background: var(--critic-comment);
-  box-shadow: 0 1px 4px rgb(0 0 0 / 20%);
+  box-shadow: 0 1px 5px rgb(0 0 0 / 28%);
   vertical-align: text-top;
   cursor: pointer;
 }
 
 .critic-inline-anchor::after {
   content: "";
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--text-on-accent);
 }
@@ -230,12 +230,6 @@
     color-mix(in srgb, var(--interactive-accent) 22%, transparent);
 }
 
-.critic-review-card.critic-collided {
-  box-shadow:
-    -3px 0 0 color-mix(in srgb, var(--interactive-accent) 10%, transparent),
-    0 3px 12px rgb(0 0 0 / 10%);
-}
-
 .critic-review-card.critic-offscreen {
   opacity: 0;
   pointer-events: none;
@@ -261,6 +255,13 @@
   margin-left: auto;
 }
 
+.critic-card-navigation {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+
 .critic-card-action-placeholder,
 .critic-card-action {
   flex: 0 0 24px;
@@ -268,22 +269,50 @@
   height: 24px;
 }
 
-.critic-card-action {
-  display: grid;
-  place-items: center;
+.critic-review-card button.critic-card-control {
+  min-width: 0;
+  margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 5px;
   background: transparent;
+  box-shadow: none;
+  font-family: inherit;
+  line-height: 1;
+  appearance: none;
+}
+
+.critic-review-card button.critic-card-action,
+.critic-review-card button.critic-card-navigation-button {
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
   color: var(--text-muted);
-  font-size: 15px;
-  font-weight: 700;
   cursor: pointer;
 }
 
-.critic-card-action:hover,
-.critic-card-action:focus-visible {
+.critic-review-card button.critic-card-action:hover,
+.critic-review-card button.critic-card-action:focus-visible,
+.critic-review-card button.critic-card-navigation-button:hover:not(:disabled),
+.critic-review-card button.critic-card-navigation-button:focus-visible {
   background: var(--background-modifier-hover);
+  box-shadow: none;
+}
+
+.critic-review-card button.critic-card-action {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.critic-review-card button.critic-card-navigation-button {
+  width: 24px;
+  height: 24px;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.critic-review-card button.critic-card-navigation-button:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .critic-card-action-accept,

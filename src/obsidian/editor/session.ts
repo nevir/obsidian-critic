@@ -45,6 +45,9 @@ export class CriticEditorSession implements PluginValue {
       {
         focus: reviewId => this.focusReview(reviewId),
         clearFocus: () => this.clearFocus(),
+        navigate: direction => {
+          this.navigate(direction);
+        },
         act: (reviewId, action) => this.applyReviewAction(reviewId, action),
       },
       host.statusBarContainer,

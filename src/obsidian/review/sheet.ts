@@ -42,6 +42,7 @@ export class ReviewSheet {
         index,
         total,
         sourcePath,
+        { showNavigation: true },
       );
       this.reviewId = presentation.id;
       this.element.append(this.card.element);

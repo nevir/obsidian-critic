@@ -84,10 +84,6 @@ export class ReviewRail {
       const visible = cardNear || anchorNear;
       card.setVisible(visible);
       element.classList.toggle('critic-offscreen', !visible);
-      element.classList.toggle(
-        'critic-collided',
-        Math.abs(item.top - item.naturalTop) > 2 || item.groupKey !== undefined,
-      );
       commitNib(element, item.anchorRect.top - item.top, item.height);
     }
     for (const [id, card] of this.cards) {
@@ -103,7 +99,6 @@ export class ReviewRail {
       card.element.style.removeProperty('top');
       card.element.classList.remove(
         'critic-offscreen',
-        'critic-collided',
         'critic-nib-hidden',
         'critic-nib-top',
         'critic-nib-bottom',

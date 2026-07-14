@@ -1,5 +1,11 @@
 import { type App, Component, MarkdownRenderer } from 'obsidian';
-
+import {
+  cardActionFromEvent,
+  cardNavigationFromEvent,
+  renderCardHeader,
+  updateCardSequence,
+} from './card-controls';
+import type { NavigationDirection } from './navigation';
 import type {
   ReviewAction,
   ReviewChangePresentation,
@@ -10,7 +16,12 @@ import type {
 export interface ReviewCardCallbacks {
   readonly focus: (reviewId: string) => void;
   readonly clearFocus: () => void;
+  readonly navigate: (direction: NavigationDirection) => void;
   readonly act: (reviewId: string, action: ReviewAction) => void;
+}
+
+export interface ReviewCardOptions {
+  readonly showNavigation?: boolean;
 }
 
 export class ReviewCard {
@@ -26,6 +37,7 @@ export class ReviewCard {
     index: number,
     total: number,
     sourcePath: string,
+    private readonly options: ReviewCardOptions = {},
   ) {
     this.element = document.createElement('section');
     this.element.className = 'critic-review-card';
@@ -50,11 +62,13 @@ export class ReviewCard {
     const signature = JSON.stringify([presentation, sourcePath]);
     if (signature !== this.contentSignature) {
       this.contentSignature = signature;
-      this.render(presentation, index, total, sourcePath);
-      return;
+      this.render(presentation, sourcePath);
     }
-    const position = this.element.querySelector('.critic-card-position');
-    if (position !== null) position.textContent = `${index + 1}/${total}`;
+    this.updatePosition(index, total);
+  }
+
+  private updatePosition(index: number, total: number): void {
+    updateCardSequence(this.element, index, total);
   }
 
   setFocused(focused: boolean): void {
@@ -77,19 +91,14 @@ export class ReviewCard {
     this.element.remove();
   }
 
-  private render(
-    presentation: ReviewPresentation,
-    index: number,
-    total: number,
-    sourcePath: string,
-  ): void {
+  private render(presentation: ReviewPresentation, sourcePath: string): void {
     this.renderGeneration += 1;
     const generation = this.renderGeneration;
     this.component?.unload();
     this.component = new Component();
     this.component.load();
     this.element.replaceChildren(
-      renderHeader(presentation, index, total),
+      renderCardHeader(presentation, this.options.showNavigation === true),
       renderBody(
         this.app,
         presentation,
@@ -101,7 +110,13 @@ export class ReviewCard {
   }
 
   private readonly handleClick = (event: MouseEvent): void => {
-    const action = actionFromEvent(event);
+    const direction = cardNavigationFromEvent(event);
+    if (direction !== null) {
+      event.stopPropagation();
+      this.callbacks.navigate(direction);
+      return;
+    }
+    const action = cardActionFromEvent(event);
     const reviewId = this.element.dataset['criticReviewId'];
     if (reviewId === undefined) return;
     event.stopPropagation();
@@ -126,34 +141,6 @@ export class ReviewCard {
     event.stopPropagation();
     this.callbacks.focus(reviewId);
   };
-}
-
-function renderHeader(
-  presentation: ReviewPresentation,
-  index: number,
-  total: number,
-): HTMLElement {
-  const header = document.createElement('header');
-  header.className = 'critic-card-header';
-
-  const position = document.createElement('span');
-  position.className = 'critic-card-position';
-  position.textContent = `${index + 1}/${total}`;
-  header.append(position);
-
-  const actions = document.createElement('div');
-  actions.className = 'critic-card-actions';
-  if (presentation.headerActions.length === 1) {
-    const placeholder = document.createElement('span');
-    placeholder.className = 'critic-card-action-placeholder';
-    placeholder.setAttribute('aria-hidden', 'true');
-    actions.append(placeholder);
-  }
-  for (const action of presentation.headerActions) {
-    actions.append(actionButton(action));
-  }
-  header.append(actions);
-  return header;
 }
 
 function renderBody(
@@ -234,36 +221,4 @@ function renderMessage(
     if (isCurrent()) content.textContent = message.markdown;
   });
   return container;
-}
-
-function actionButton(action: ReviewAction): HTMLButtonElement {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = `critic-card-action critic-card-action-${action}`;
-  button.dataset['criticAction'] = action;
-  const label = actionLabel(action);
-  button.setAttribute('aria-label', label);
-  button.title = label;
-  button.textContent = action === 'reject' ? '×' : '✓';
-  return button;
-}
-
-function actionFromEvent(event: MouseEvent): ReviewAction | null {
-  if (!(event.target instanceof Element)) return null;
-  const action = event.target.closest<HTMLElement>('[data-critic-action]')
-    ?.dataset['criticAction'];
-  return action === 'accept' || action === 'reject' || action === 'resolve'
-    ? action
-    : null;
-}
-
-function actionLabel(action: ReviewAction) {
-  switch (action) {
-    case 'accept':
-      return 'Accept suggestion';
-    case 'reject':
-      return 'Reject suggestion';
-    case 'resolve':
-      return 'Resolve comment';
-  }
 }
