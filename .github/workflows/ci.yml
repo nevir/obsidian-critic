@@ -19,6 +19,8 @@ jobs:
             task: lint
           - name: Typecheck
             task: typecheck
+          - name: Test
+            task: test
           - name: Build
             task: build
           - name: Version

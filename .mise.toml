@@ -47,6 +47,14 @@ description = "Type-check the plugin without emitting files"
 depends = ["install"]
 run = "yarn exec tsc"
 
+[tasks.test]
+description = "Type-check and run the host-independent unit tests"
+depends = ["install"]
+run = [
+  "yarn exec tsc --project tsconfig.tests.json",
+  "yarn exec tsx --test \"tests/**/*.test.ts\"",
+]
+
 [tasks.versioncheck]
 description = "Check that changes declare a version and manifests agree"
 depends = ["install"]
@@ -58,7 +66,7 @@ run = [
 
 [tasks.check]
 description = "Run every required validation"
-depends = ["lint", "typecheck", "build"]
+depends = ["lint", "test", "typecheck", "build"]
 
 [tasks.fix]
 description = "Apply safe Biome formatting, lint, and assist fixes"

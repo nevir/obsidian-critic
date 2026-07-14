@@ -1,0 +1,9 @@
+{
+  "extends": "./.toolchain/typescript/base.jsonc",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": ["src/core/**/*.ts", "tests/**/*.ts"]
+}

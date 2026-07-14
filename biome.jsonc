@@ -33,5 +33,18 @@
     ".toolchain/biome/rules/shared/security.jsonc",
     ".toolchain/biome/rules/shared/style.jsonc",
     ".toolchain/biome/rules/shared/suspicious.jsonc"
+  ],
+  "overrides": [
+    {
+      "includes": ["tests/**"],
+      "linter": {
+        "rules": {
+          "security": {
+            // CriticMarkup fixtures intentionally resemble high-entropy tokens.
+            "noSecrets": "off"
+          }
+        }
+      }
+    }
   ]
 }

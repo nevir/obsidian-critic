@@ -1,7 +1,7 @@
 {
-  "id": "template",
-  "name": "Obsidian Template",
-  "description": "A template for creating Obsidian plugins",
+  "id": "critic",
+  "name": "Critic",
+  "description": "Review CriticMarkup suggestions and comments naturally",
   "version": "0.1.1",
   "minAppVersion": "1.12.7",
   "isDesktopOnly": false,

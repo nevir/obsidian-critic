@@ -1,1 +1,1 @@
-export { Plugin as default } from './Plugin';
+export { CriticPlugin as default } from './obsidian/plugin';
