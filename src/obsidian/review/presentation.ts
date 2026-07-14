@@ -18,7 +18,6 @@ export interface ReviewPresentation {
   readonly change: ReviewChangePresentation | null;
   readonly messages: readonly ReviewMessagePresentation[];
   readonly headerActions: readonly ReviewAction[];
-  readonly canResolveDiscussion: boolean;
 }
 
 export function buildReviewPresentations(
@@ -32,8 +31,6 @@ export function buildReviewPresentations(
     change: changePresentation(review),
     messages: messagePresentations(review.messages, showAuthors),
     headerActions: headerActions(review),
-    canResolveDiscussion:
-      review.kind === 'suggestion' && review.messages.length > 0,
   }));
 }
 

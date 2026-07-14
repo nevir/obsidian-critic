@@ -30,6 +30,10 @@ export class ReviewCard {
     this.element = document.createElement('section');
     this.element.className = 'critic-review-card';
     this.element.tabIndex = 0;
+    this.element.addEventListener('mousedown', this.stopEditorInput);
+    this.element.addEventListener('touchstart', this.stopEditorInput, {
+      passive: true,
+    });
     this.element.addEventListener('click', this.handleClick);
     this.element.addEventListener('keydown', this.handleKeydown);
     this.update(presentation, index, total, sourcePath);
@@ -66,6 +70,8 @@ export class ReviewCard {
     this.renderGeneration += 1;
     this.component?.unload();
     this.component = null;
+    this.element.removeEventListener('mousedown', this.stopEditorInput);
+    this.element.removeEventListener('touchstart', this.stopEditorInput);
     this.element.removeEventListener('click', this.handleClick);
     this.element.removeEventListener('keydown', this.handleKeydown);
     this.element.remove();
@@ -98,12 +104,16 @@ export class ReviewCard {
     const action = actionFromEvent(event);
     const reviewId = this.element.dataset['criticReviewId'];
     if (reviewId === undefined) return;
+    event.stopPropagation();
     if (action !== null) {
-      event.stopPropagation();
       this.callbacks.act(reviewId, action);
       return;
     }
     this.callbacks.focus(reviewId);
+  };
+
+  private readonly stopEditorInput = (event: Event): void => {
+    event.stopPropagation();
   };
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -112,6 +122,7 @@ export class ReviewCard {
     const reviewId = this.element.dataset['criticReviewId'];
     if (reviewId === undefined) return;
     event.preventDefault();
+    event.stopPropagation();
     this.callbacks.focus(reviewId);
   };
 }
@@ -165,11 +176,6 @@ function renderBody(
       );
     }
     body.append(messages);
-  }
-  if (presentation.canResolveDiscussion) {
-    const resolve = actionButton('resolve', 'Resolve discussion');
-    resolve.classList.add('critic-resolve-discussion');
-    body.append(resolve);
   }
   return body;
 }

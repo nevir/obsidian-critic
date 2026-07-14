@@ -108,18 +108,20 @@ export class CriticEditorSession implements PluginValue {
     );
   }
 
-  focusReview(reviewId: string): boolean {
+  focusReview(reviewId: string, scrollIntoView = true): boolean {
     const review = this.reviewById(reviewId);
     if (review === undefined) return false;
     this.focusedReviewId = reviewId;
     this.syncFocusClasses();
     this.surface.setFocus(reviewId, this.sourcePath);
-    this.view.dispatch({
-      effects: EditorView.scrollIntoView(review.anchor.from, {
-        y: 'nearest',
-        yMargin: Math.min(48, this.view.scrollDOM.clientHeight / 4),
-      }),
-    });
+    if (scrollIntoView) {
+      this.view.dispatch({
+        effects: EditorView.scrollIntoView(review.anchor.from, {
+          y: 'nearest',
+          yMargin: Math.min(48, this.view.scrollDOM.clientHeight / 4),
+        }),
+      });
+    }
     return true;
   }
 
@@ -140,12 +142,20 @@ export class CriticEditorSession implements PluginValue {
   }
 
   handleClick(event: MouseEvent): void {
-    const reviewId = reviewIdFromEvent(event);
-    if (reviewId === null) {
+    const target = reviewTargetFromEvent(event);
+    if (target === null) {
       this.clearFocus();
       return;
     }
-    this.focusReview(reviewId);
+    const reviewId = target.dataset['criticReviewId'];
+    if (reviewId === undefined) {
+      this.clearFocus();
+      return;
+    }
+    this.focusReview(
+      reviewId,
+      !target.matches('.critic-annotation, .critic-inline-anchor'),
+    );
   }
 
   handleKeydown(event: KeyboardEvent): boolean {
@@ -204,13 +214,9 @@ export class CriticEditorSession implements PluginValue {
   }
 }
 
-function reviewIdFromEvent(event: MouseEvent): string | null {
+function reviewTargetFromEvent(event: MouseEvent): HTMLElement | null {
   if (!(event.target instanceof Element)) return null;
-  return (
-    event.target.closest<HTMLElement>('[data-critic-review-id]')?.dataset[
-      'criticReviewId'
-    ] ?? null
-  );
+  return event.target.closest<HTMLElement>('[data-critic-review-id]');
 }
 
 function arrowDirection(key: string): NavigationDirection | null {

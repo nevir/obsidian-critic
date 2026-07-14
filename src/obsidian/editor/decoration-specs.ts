@@ -8,6 +8,7 @@ import type {
 export type AnnotationClass =
   | 'addition'
   | 'deletion'
+  | 'expanded'
   | 'highlight'
   | 'original'
   | 'replacement';
@@ -70,8 +71,10 @@ function compactReviewSpecs(review: ReviewItem): DecorationSpec[] {
 }
 
 function selectedReviewSpecs(review: ReviewItem): DecorationSpec[] {
-  if (review.mark === null) return [];
-  return visibleRanges(review.id, review.mark);
+  return [
+    visibleRange(review.id, review.source, 'expanded'),
+    ...(review.mark === null ? [] : visibleRanges(review.id, review.mark)),
+  ];
 }
 
 function anchorSpecs(reviewId: string, mark: AnchorMark): DecorationSpec[] {

@@ -38,7 +38,7 @@ test('uses one point widget for an adjacent thread', () => {
   );
 });
 
-test('keeps selected CriticMarkup source directly editable', () => {
+test('keeps selected CriticMarkup source directly editable as one expression', () => {
   const source = 'before {~~old~>new~~}{>>why<<} after';
   const document = parseCriticMarkup(source);
   const review = document.reviews[0];
@@ -50,11 +50,43 @@ test('keeps selected CriticMarkup source directly editable', () => {
   ]);
 
   assert.equal(compact.filter(spec => spec.kind === 'replace').length, 4);
-  assert.deepEqual(markClasses(selected), ['original', 'replacement']);
+  assert.deepEqual(markClasses(selected), [
+    'expanded',
+    'original',
+    'replacement',
+  ]);
+  assert.deepEqual(selected[0], {
+    kind: 'mark',
+    from: review.source.from,
+    to: review.source.to,
+    annotationClass: 'expanded',
+    reviewId: review.id,
+  });
   assert.equal(
     selected.some(spec => spec.kind === 'replace'),
     false,
   );
+});
+
+test('keeps an expanded point discussion anchored to its full source', () => {
+  const source = 'before {>>[Ian] note<<} after';
+  const document = parseCriticMarkup(source);
+  const review = document.reviews[0];
+  assert.ok(review);
+
+  const selected = buildDecorationSpecs(document, [
+    { from: source.indexOf('note'), to: source.indexOf('note') },
+  ]);
+
+  assert.deepEqual(selected, [
+    {
+      kind: 'mark',
+      from: review.source.from,
+      to: review.source.to,
+      annotationClass: 'expanded',
+      reviewId: review.id,
+    },
+  ]);
 });
 
 test('does not expose a review when the caret sits immediately after it', () => {

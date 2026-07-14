@@ -58,6 +58,32 @@ test('recomputes direct decorations for selections and document changes', () => 
   );
 });
 
+test('preserves the last mode when the host Live Preview field is unavailable', () => {
+  let hostMode: boolean | undefined;
+  const field = createCriticEditorStateField(() => hostMode, {
+    initialLivePreview: true,
+  });
+  const initial = EditorState.create({
+    doc: '{++text++}',
+    extensions: [field],
+  });
+
+  assert.equal(initial.field(field).livePreview, true);
+  assert.notEqual(initial.field(field).decorations.size, 0);
+
+  const unavailable = initial.update({ selection: { anchor: 1 } }).state;
+  assert.equal(unavailable.field(field).livePreview, true);
+
+  hostMode = false;
+  const sourceMode = unavailable.update({ selection: { anchor: 2 } }).state;
+  assert.equal(sourceMode.field(field).livePreview, false);
+  assert.equal(sourceMode.field(field).decorations.size, 0);
+
+  hostMode = undefined;
+  const stillSourceMode = sourceMode.update({ selection: { anchor: 3 } }).state;
+  assert.equal(stillSourceMode.field(field).livePreview, false);
+});
+
 function livePreviewState(source: string): EditorState {
   return EditorState.create({
     doc: source,

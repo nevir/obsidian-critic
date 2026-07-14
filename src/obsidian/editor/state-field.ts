@@ -16,13 +16,23 @@ export interface CriticEditorSnapshot {
   readonly livePreview: boolean;
 }
 
-export type LivePreviewReader = (state: EditorState) => boolean;
+export type LivePreviewReader = (state: EditorState) => boolean | undefined;
+
+export interface CriticEditorStateOptions {
+  readonly initialLivePreview?: boolean;
+}
 
 export function createCriticEditorStateField(
   readLivePreview: LivePreviewReader,
+  options: CriticEditorStateOptions = {},
 ): StateField<CriticEditorSnapshot> {
   return StateField.define<CriticEditorSnapshot>({
-    create: state => createSnapshot(state, readLivePreview),
+    create: state =>
+      createSnapshot(
+        state,
+        readLivePreview,
+        options.initialLivePreview ?? false,
+      ),
     update: (snapshot, transaction) =>
       updateSnapshot(snapshot, transaction, readLivePreview),
     provide: field =>
@@ -33,9 +43,14 @@ export function createCriticEditorStateField(
 function createSnapshot(
   state: EditorState,
   readLivePreview: LivePreviewReader,
+  initialLivePreview: boolean,
 ): CriticEditorSnapshot {
   const parsed = parseCriticMarkup(state.doc.sliceString(0));
-  return snapshotFor(parsed, state, readLivePreview);
+  return snapshotFor(
+    parsed,
+    state,
+    readLivePreview(state) ?? initialLivePreview,
+  );
 }
 
 function updateSnapshot(
@@ -43,7 +58,8 @@ function updateSnapshot(
   transaction: Transaction,
   readLivePreview: LivePreviewReader,
 ): CriticEditorSnapshot {
-  const livePreview = readLivePreview(transaction.state);
+  const livePreview =
+    readLivePreview(transaction.state) ?? snapshot.livePreview;
   if (
     !transaction.docChanged &&
     transaction.selection === undefined &&
@@ -54,14 +70,13 @@ function updateSnapshot(
   const parsed = transaction.docChanged
     ? parseCriticMarkup(transaction.state.doc.sliceString(0))
     : snapshot.parsed;
-  return snapshotFor(parsed, transaction.state, readLivePreview, livePreview);
+  return snapshotFor(parsed, transaction.state, livePreview);
 }
 
 function snapshotFor(
   parsed: ParsedDocument,
   state: EditorState,
-  readLivePreview: LivePreviewReader,
-  livePreview = readLivePreview(state),
+  livePreview: boolean,
 ): CriticEditorSnapshot {
   return {
     parsed,

@@ -29,6 +29,7 @@
 .critic-annotation-replacement {
   background: color-mix(in srgb, var(--critic-add) 18%, transparent);
   box-shadow: inset 0 -2px 0 var(--critic-add);
+  text-decoration: none;
 }
 
 .critic-annotation-deletion,
@@ -44,11 +45,29 @@
   box-shadow: inset 0 -2px 0 var(--critic-highlight);
 }
 
+.critic-annotation-expanded {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--text-muted) 9%, transparent);
+  box-shadow: inset 0 0 0 1px var(--background-modifier-border-hover);
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+/* Critic substitutions look like Markdown strikethrough to Obsidian. */
+.critic-live-preview .critic-annotation-expanded.cm-strikethrough,
+.critic-live-preview .critic-annotation-expanded .cm-strikethrough {
+  text-decoration: none;
+}
+
 .critic-annotation.critic-focused,
 .critic-inline-anchor.critic-focused {
   outline: 3px solid
     color-mix(in srgb, var(--interactive-accent) 42%, transparent);
   outline-offset: 2px;
+}
+
+.critic-annotation-expanded .critic-annotation.critic-focused {
+  outline: none;
 }
 
 .critic-inline-anchor {
@@ -326,15 +345,6 @@
 
 .critic-card-message-content > :last-child {
   margin-bottom: 0;
-}
-
-.critic-resolve-discussion {
-  width: auto;
-  height: auto;
-  margin: 5px 0 0 auto;
-  padding: 4px 6px;
-  font-size: var(--font-ui-smaller);
-  font-weight: 500;
 }
 
 .critic-review-sheet {
