@@ -11,6 +11,7 @@ import {
 import {
   feasibleFixture,
   mulberry32,
+  type RandomLayoutFixture,
   randomFixture,
 } from '../../fixtures/random-layout.ts';
 import { assertLegalLayout } from './test-assertions.ts';
@@ -106,7 +107,7 @@ test('one-pixel document steps stay locally bounded in feasible notes', () => {
   }
 });
 
-function onePixelStep(fixture: ReturnType<typeof randomFixture>) {
+function onePixelStep(fixture: RandomLayoutFixture) {
   const initial = computeExpandedSnapshot(
     fixture.measurements,
     fixture.geometry,

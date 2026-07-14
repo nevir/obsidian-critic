@@ -3,7 +3,6 @@ import type { CommentMark, ReviewItem } from '../../core/model';
 export type ReviewAction = 'accept' | 'reject' | 'resolve';
 
 export interface ReviewMessagePresentation {
-  readonly id: string;
   readonly authorLabel: string | null;
   readonly markdown: string;
 }
@@ -61,7 +60,7 @@ function messagePresentations(
     const authorLabel =
       showAuthors && author !== previousAuthor ? author : null;
     previousAuthor = author;
-    return { id: message.id, authorLabel, markdown: message.body };
+    return { authorLabel, markdown: message.body };
   });
 }
 

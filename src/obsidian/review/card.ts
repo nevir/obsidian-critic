@@ -236,18 +236,15 @@ function renderMessage(
   return container;
 }
 
-function actionButton(
-  action: ReviewAction,
-  visibleLabel?: string,
-): HTMLButtonElement {
+function actionButton(action: ReviewAction): HTMLButtonElement {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = `critic-card-action critic-card-action-${action}`;
   button.dataset['criticAction'] = action;
-  const label = visibleLabel ?? actionLabel(action);
+  const label = actionLabel(action);
   button.setAttribute('aria-label', label);
   button.title = label;
-  button.textContent = visibleLabel ?? (action === 'reject' ? '×' : '✓');
+  button.textContent = action === 'reject' ? '×' : '✓';
   return button;
 }
 

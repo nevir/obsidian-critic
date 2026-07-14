@@ -1,15 +1,12 @@
 import {
   CARD_GAP,
+  type LayoutGeometry,
   type LayoutMeasurement,
 } from '../../src/core/layout/index.ts';
 
-interface RandomLayoutFixture {
+export interface RandomLayoutFixture {
   readonly measurements: readonly LayoutMeasurement[];
-  readonly geometry: {
-    readonly railHeight: number;
-    readonly documentTop: number;
-    readonly documentBottom: number;
-  };
+  readonly geometry: LayoutGeometry;
 }
 
 export function randomFixture(

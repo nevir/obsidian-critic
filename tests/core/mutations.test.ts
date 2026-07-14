@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-
+import type { ReviewItem } from '../../src/core/model.ts';
 import {
   acceptReview,
   applySourceEdits,
@@ -20,8 +20,7 @@ const decisions = [
 
 test('accepts and rejects every suggestion shape atomically', () => {
   for (const [source, accepted, rejected] of decisions) {
-    const review = parseCriticMarkup(source).reviews[0];
-    assert.ok(review !== undefined);
+    const review = firstReview(source);
     assert.equal(applySourceEdits(source, [acceptReview(review)]), accepted);
     assert.equal(applySourceEdits(source, [rejectReview(review)]), rejected);
   }
@@ -29,8 +28,7 @@ test('accepts and rejects every suggestion shape atomically', () => {
 
 test('resolves range and point comments without changing accepted prose', () => {
   const rangeSource = 'Before {==target==}{>>one<<}{>>two<<} after.';
-  const rangeReview = parseCriticMarkup(rangeSource).reviews[0];
-  assert.ok(rangeReview !== undefined);
+  const rangeReview = firstReview(rangeSource);
   const rangeEdit = resolveReview(rangeReview);
   assert.ok(rangeEdit !== null);
   assert.equal(
@@ -39,8 +37,7 @@ test('resolves range and point comments without changing accepted prose', () => 
   );
 
   const pointSource = 'Before.{>>one<<}{>>two<<} After.';
-  const pointReview = parseCriticMarkup(pointSource).reviews[0];
-  assert.ok(pointReview !== undefined);
+  const pointReview = firstReview(pointSource);
   const pointEdit = resolveReview(pointReview);
   assert.ok(pointEdit !== null);
   assert.equal(applySourceEdits(pointSource, [pointEdit]), 'Before. After.');
@@ -48,21 +45,18 @@ test('resolves range and point comments without changing accepted prose', () => 
 
 test('resolves a suggestion discussion without deciding the suggestion', () => {
   const source = '{~~old~>new~~}{>>one<<}{>>two<<}';
-  const review = parseCriticMarkup(source).reviews[0];
-  assert.ok(review !== undefined);
+  const review = firstReview(source);
   const edit = resolveReview(review);
   assert.ok(edit !== null);
   assert.equal(applySourceEdits(source, [edit]), '{~~old~>new~~}');
 
-  const bare = parseCriticMarkup('{++new++}').reviews[0];
-  assert.ok(bare !== undefined);
+  const bare = firstReview('{++new++}');
   assert.equal(resolveReview(bare), null);
 });
 
 test('decisions decode Critic escapes but preserve ordinary backslashes', () => {
   const source = String.raw`{++literal \++} and \\ path++}`;
-  const review = parseCriticMarkup(source).reviews[0];
-  assert.ok(review !== undefined);
+  const review = firstReview(source);
   assert.equal(
     applySourceEdits(source, [acceptReview(review)]),
     String.raw`literal ++} and \\ path`,
@@ -70,8 +64,7 @@ test('decisions decode Critic escapes but preserve ordinary backslashes', () => 
 });
 
 test('rejects decisions that do not match the review kind', () => {
-  const comment = parseCriticMarkup('{>>comment<<}').reviews[0];
-  assert.ok(comment !== undefined);
+  const comment = firstReview('{>>comment<<}');
   assert.throws(() => acceptReview(comment), TypeError);
   assert.throws(() => rejectReview(comment), TypeError);
 });
@@ -120,8 +113,7 @@ test('generated payloads round-trip through both decision paths', () => {
 
   for (const payload of payloads) {
     const addition = `{++${payload}++}`;
-    const additionReview = parseCriticMarkup(addition).reviews[0];
-    assert.ok(additionReview !== undefined, addition);
+    const additionReview = firstReview(addition);
     assert.equal(
       applySourceEdits(addition, [acceptReview(additionReview)]),
       additionReview.mark?.kind === 'addition'
@@ -134,8 +126,7 @@ test('generated payloads round-trip through both decision paths', () => {
     );
 
     const deletion = `{--${payload}--}`;
-    const deletionReview = parseCriticMarkup(deletion).reviews[0];
-    assert.ok(deletionReview !== undefined, deletion);
+    const deletionReview = firstReview(deletion);
     assert.equal(
       applySourceEdits(deletion, [acceptReview(deletionReview)]),
       '',
@@ -148,3 +139,9 @@ test('generated payloads round-trip through both decision paths', () => {
     );
   }
 });
+
+function firstReview(source: string): ReviewItem {
+  const review = parseCriticMarkup(source).reviews[0];
+  assert.ok(review !== undefined, source);
+  return review;
+}
