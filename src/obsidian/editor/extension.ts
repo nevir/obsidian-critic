@@ -2,13 +2,13 @@ import type { Extension } from '@codemirror/state';
 import { ViewPlugin } from '@codemirror/view';
 
 import type { CriticEditorHost } from './host';
+import { criticEditorStateField } from './live-preview-state';
 import { CriticEditorSession } from './session';
 
 const criticEditorPlugin = ViewPlugin.fromClass<
   CriticEditorSession,
   CriticEditorHost
 >(CriticEditorSession, {
-  decorations: session => session.decorations,
   eventHandlers: {
     click(event) {
       this.handleClick(event);
@@ -21,5 +21,5 @@ const criticEditorPlugin = ViewPlugin.fromClass<
 });
 
 export function createCriticEditorExtension(host: CriticEditorHost): Extension {
-  return criticEditorPlugin.of(host);
+  return [criticEditorStateField, criticEditorPlugin.of(host)];
 }

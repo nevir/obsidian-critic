@@ -1,19 +1,16 @@
 import {
-  Decoration,
-  type DecorationSet,
   EditorView,
   type PluginValue,
   type ViewUpdate,
 } from '@codemirror/view';
-import { editorInfoField, editorLivePreviewField } from 'obsidian';
+import { editorInfoField } from 'obsidian';
 
-import type { ParsedDocument, ReviewItem, SourceRange } from '../../core/model';
+import type { ParsedDocument, ReviewItem } from '../../core/model';
 import {
   acceptReview,
   rejectReview,
   resolveReview,
 } from '../../core/mutations';
-import { parseCriticMarkup } from '../../core/syntax/index';
 import {
   adjacentReviewId,
   type NavigationDirection,
@@ -24,12 +21,10 @@ import {
   type ReviewAction,
 } from '../review/presentation';
 import { ReviewSurfaceController } from '../review/surface';
-import { buildDecorationSpecs } from './decoration-specs';
-import { createDecorationSet } from './decorations';
 import type { CriticEditorHost } from './host';
+import { criticEditorStateField } from './live-preview-state';
 
 export class CriticEditorSession implements PluginValue {
-  decorations: DecorationSet = Decoration.none;
   private parsed: ParsedDocument;
   private livePreview: boolean;
   private focusedReviewId: string | null = null;
@@ -39,9 +34,9 @@ export class CriticEditorSession implements PluginValue {
     readonly view: EditorView,
     private readonly host: CriticEditorHost,
   ) {
-    this.parsed = parseCriticMarkup(view.state.doc.sliceString(0));
-    this.livePreview = readLivePreview(view);
-    this.rebuildDecorations();
+    const snapshot = view.state.field(criticEditorStateField);
+    this.parsed = snapshot.parsed;
+    this.livePreview = snapshot.livePreview;
     this.syncEditorClass();
     this.surface = new ReviewSurfaceController(view, host.app, {
       focus: reviewId => this.focusReview(reviewId),
@@ -65,13 +60,14 @@ export class CriticEditorSession implements PluginValue {
   }
 
   update(update: ViewUpdate): void {
-    const nextLivePreview = readLivePreview(this.view);
+    const snapshot = update.state.field(criticEditorStateField);
+    const nextLivePreview = snapshot.livePreview;
     const modeChanged = nextLivePreview !== this.livePreview;
     this.livePreview = nextLivePreview;
 
     if (update.docChanged) {
       const previousIds = this.reviewIds();
-      this.parsed = parseCriticMarkup(update.state.doc.sliceString(0));
+      this.parsed = snapshot.parsed;
       this.focusedReviewId = reconcileFocusedReviewId(
         previousIds,
         this.reviewIds(),
@@ -79,9 +75,6 @@ export class CriticEditorSession implements PluginValue {
       );
     }
 
-    if (update.docChanged || update.selectionSet || modeChanged) {
-      this.rebuildDecorations();
-    }
     if (update.docChanged || modeChanged) this.syncSurface();
     if (
       update.docChanged ||
@@ -174,14 +167,6 @@ export class CriticEditorSession implements PluginValue {
     });
   }
 
-  private rebuildDecorations(): void {
-    this.decorations = this.livePreview
-      ? createDecorationSet(
-          buildDecorationSpecs(this.parsed, selectionRanges(this.view)),
-        )
-      : Decoration.none;
-  }
-
   private reviewById(reviewId: string): ReviewItem | undefined {
     return this.parsed.reviews.find(review => review.id === reviewId);
   }
@@ -217,17 +202,6 @@ export class CriticEditorSession implements PluginValue {
       );
     }
   }
-}
-
-function readLivePreview(view: EditorView): boolean {
-  return view.state.field(editorLivePreviewField, false) ?? false;
-}
-
-function selectionRanges(view: EditorView): SourceRange[] {
-  return view.state.selection.ranges.map(range => ({
-    from: range.from,
-    to: range.to,
-  }));
 }
 
 function reviewIdFromEvent(event: MouseEvent): string | null {
