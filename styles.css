@@ -10,7 +10,10 @@
   position: relative;
 }
 
-.critic-editor.critic-expanded .cm-scroller {
+/* Outrank Obsidian's file-margin shorthand without using !important. */
+.view-content > .markdown-source-view.mod-cm6
+  > .critic-editor.critic-expanded
+  > .cm-scroller {
   padding-right: calc(var(--critic-rail-width) + var(--critic-rail-gap));
 }
 
